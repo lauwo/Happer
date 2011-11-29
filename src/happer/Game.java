@@ -8,7 +8,7 @@ package happer;
  *
  * @author Laurens
  */
-public class Happer {
+public class Game {
 
 	/**
 	 * @param args the command line arguments
