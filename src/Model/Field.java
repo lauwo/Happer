@@ -7,6 +7,7 @@ package Model;
 import Components.Direction;
 import View.Playfield;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  *
@@ -50,6 +51,10 @@ public class Field {
 	public GameObject getGameObject() {
 		return gameObject;
 	}
+	
+	public boolean hasGameObject() {
+		return gameObject != null;
+	}
 
 	public void setGameObject(GameObject gameObject) {
 		this.gameObject = gameObject;
@@ -66,5 +71,22 @@ public class Field {
 	
 	public Playfield getPlayField() {
 		return this.playfield;
+	}
+
+	public HashMap<Direction, Field> getNeighbourFields() {
+		return neighbourFields;
+	}
+	
+	public Direction getNeighbourDirection(Field neighbourField) {
+		Iterator it = neighbourFields.keySet().iterator();
+		
+		while (it.hasNext()) {
+			Direction direction = (Direction)it.next();
+			if (neighbourFields.get(direction).equals(neighbourField)) {
+				return direction;
+			}			
+		}
+		
+		return null;
 	}
 }

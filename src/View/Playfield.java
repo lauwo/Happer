@@ -11,107 +11,169 @@
 package View;
 
 import Components.Direction;
+import Components.Logger;
+import Model.Box;
 import Model.Field;
+import Model.Happer;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
-import Model.Happer;
 import Model.Human;
+import Model.Rock;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import javax.imageio.ImageIO;
+import java.util.Collections;
 
 /**
  *
  * @author Laurens
  */
-public class Playfield extends javax.swing.JPanel {
+public class Playfield extends javax.swing.JPanel implements KeyListener {
 
-	Dimension playFieldSize = new Dimension(20, 20);
-    ArrayList<Field> fields = new ArrayList<Field>();
+	Dimension playFieldSize;
+    ArrayList<ArrayList<Field>> rows;
 	Human human;
+	Happer happer;
 	
-	/** Creates new form Playfield */
-	public Playfield() {
+	public Playfield(int dimension) {
 		initComponents();
-		setLayout(null);		
-        setPreferredSize(new Dimension(playFieldSize.width * Field.width, playFieldSize.height * Field.height));
-
-		setBackground(Color.BLACK);
+		setLayout(null);
+		rows = new ArrayList<ArrayList<Field>>();
+		playFieldSize = new Dimension(dimension, dimension);
+        setPreferredSize(playFieldSize);
         setBorder(BorderFactory.createLineBorder(Color.yellow, 1));
-        this.setFocusable(true);
+		this.setFocusable(true);
+		addKeyListener(this);		
+		Logger.log("Playfield loaded.");
+		initiatePlayfield();
+		happer.checkHumanField();
+	}
+
+	private void initiatePlayfield() {
+		initFields();
+		setNeighbourFields();
+		addObjects(8, 10);
+		addHuman();
+		addHapper();
 	}
 	
-	public Field getRandomfield() {
-		int random = (int)Math.round(Math.random() * fields.size());
-		Field randomField = fields.get(random);
+	private void addObjects(int rockPercentage, int boxPercentage) {
+		int boxesPerRow = (int)Math.round(((double)playFieldSize.width / 100) * boxPercentage);		
+		int rocksPerRow = (int)Math.round(((double)playFieldSize.width / 100) * rockPercentage);
 		
-		if (randomField.getGameObject() == null)
-			return fields.get(random);
+		int total = boxesPerRow + rocksPerRow;
 		
-		return getRandomfield();
+		for (ArrayList<Field> row : rows) {
+			Collections.shuffle(row);
+			for (int i = 0; i < total; i++) {
+				Field currentField = row.get(i);
+				if (i <= boxesPerRow) {
+					currentField.setGameObject(new Box(currentField));
+				} else {
+					currentField.setGameObject(new Rock(currentField));
+				}
+			}
+		}		
+		
+	}
+	
+	private Field getRandomField()	{
+		int random = (int)Math.round(Math.random() * (rows.size() - 1)) + 1;		
+		ArrayList<Field> randomRow = rows.get(random - 1);
+		Field randomField = null;
+		
+		while (randomField == null) {
+			random = (int)Math.round(Math.random() * (randomRow.size() - 1)) + 1;
+			Field field = randomRow.get(random - 1);
+			if (field.getGameObject() == null)
+				randomField = field;
+		}
+		return randomField;		
+	}
+
+	private void addHuman() {				
+		human = new Human(getRandomField());
+	}
+	
+	private void addHapper() {
+		happer = new Happer(getRandomField());
 	}
 	
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		paintBackground(g);
-		human = new Human(getRandomfield());
-		addKeyListener(human);
-		human.Draw(g);			
+	}
+	
+	public void initFields() {
+		for (int i = 0; i < playFieldSize.width; i++){
+			ArrayList<Field> row = new ArrayList<Field>();
+			for (int j = 0; j < playFieldSize.height; j++) {
+				int posX = j * Field.width;
+				int posY = i * Field.height;
+				Field newField = new Field(posX, posY, this);
+				row.add(newField);			
+			}			
+			rows.add(row);
+		}
 	}
 	
     protected void paintBackground(Graphics g) {
-		for(int i =0; i < playFieldSize.width; i++){
-			for(int j =0; j < playFieldSize.height; j++){
-				int posX = i * Field.width;
-				int posY = j * Field.height;
-				g.drawRect(posX, posY, Field.width, Field.height);
-				if (fields.size() < (playFieldSize.width * playFieldSize.height)) {
-					Field newField = new Field(posX, posY, this);
-					fields.add(newField);			
+		g.setColor(Color.BLACK);
+		for (ArrayList<Field> row : rows) {
+			for (Field field : row) {
+				if (field.getGameObject() != null) {
+					if (field.getGameObject() instanceof Box)
+						g.setColor(Color.BLUE);
+					else if (field.getGameObject() instanceof Happer)
+						g.setColor(Color.RED);
+					else if (field.getGameObject() instanceof Rock)
+						g.setColor(Color.BLACK);
+					else if (field.getGameObject() instanceof Human)
+						g.setColor(Color.GREEN);
+
+					g.fillRect(field.getPosX(), field.getPosY(), Field.width, Field.height);			
 				}
-			}
-		}
-		if (fields.size() < (playFieldSize.width * playFieldSize.height)) {
-			for (Field field : fields) {
-				setNeighbourFields(field);
 			}
 		}
     }
 	
-	public void setNeighbourFields(Field newField) {
-		int currentIndex = fields.indexOf(newField);
-		int left = currentIndex - 1;
-		int right = currentIndex + 1;
-		int top = currentIndex - playFieldSize.height;
-		int down = currentIndex + playFieldSize.height;
-		int totalFields = playFieldSize.width * playFieldSize.height;
-		
-		if (currentIndex % playFieldSize.width == 0) {
-			left = -1;
-		} else if (currentIndex % (playFieldSize.width - 1) == 0) {
-			right = -1;
-		} else if (currentIndex >= (totalFields - playFieldSize.width)) {
-			down = -1;
-		} else if (currentIndex <= playFieldSize.width) {
-			top = -1;
+	public void setNeighbourFields() {
+		for (ArrayList<Field> row : rows) {
+			for (Field field : row) {				
+				int currentRow = rows.indexOf(row);
+				int currentField = row.indexOf(field);
+				Field up = getField(currentRow - 1, currentField);
+				Field down = getField(currentRow + 1, currentField);
+				Field left = getField(currentRow, currentField - 1);
+				Field right = getField(currentRow, currentField + 1);
+				
+				if (up != null)
+					field.setNeighbourField(Direction.UP, up);
+				
+				if (down != null)
+					field.setNeighbourField(Direction.DOWN, down);
+				
+				if (left != null)
+					field.setNeighbourField(Direction.LEFT, left);
+				
+				if (right != null)
+					field.setNeighbourField(Direction.RIGHT, right);
+			}
 		}
-		
-		if (top >= 0 && top < totalFields)
-			newField.setNeighbourField(Direction.UP, fields.get(top));
-		if (down >= 0 && down < totalFields)
-			newField.setNeighbourField(Direction.DOWN, fields.get(down));
-		if (left >= 0 && left < totalFields)
-			newField.setNeighbourField(Direction.LEFT, fields.get(left));
-		if (right >= 0 && right < totalFields)
-			newField.setNeighbourField(Direction.RIGHT, fields.get(right));
 	}
 	
+	private Field getField(int x, int y) {
+		if (x < rows.size() && x >= 0) {
+			if (y < rows.get(x).size() && y >= 0) {
+				return rows.get(x).get(y);
+			}
+		}
+ 		return null;
+	}
 
     @Override
     public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h)
@@ -120,6 +182,8 @@ public class Playfield extends javax.swing.JPanel {
         repaint();
         return true;
     }
+	
+	
 	
 	@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -138,4 +202,34 @@ public class Playfield extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+
+	@Override
+	public void keyTyped(KeyEvent ke) {
+		
+	}
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		 switch(e.getKeyCode()){
+            case KeyEvent.VK_DOWN:
+                 human.move(Direction.DOWN);
+                break;
+            case KeyEvent.VK_UP:
+				human.move(Direction.UP);
+                break;
+            case KeyEvent.VK_RIGHT:
+                 human.move(Direction.RIGHT);
+                break;
+            case KeyEvent.VK_LEFT:
+                 human.move(Direction.LEFT);
+                break;
+        default:
+            break;
+        }   
+	}
+
+	@Override
+	public void keyReleased(KeyEvent ke) {
+		
+	}
 }

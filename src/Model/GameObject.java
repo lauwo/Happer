@@ -14,7 +14,7 @@ import javax.imageio.ImageIO;
  *
  * @author Laurens
  */
-public class GameObject {
+public abstract class GameObject {
 	
 	String image;
 	Field field;
@@ -32,7 +32,8 @@ public class GameObject {
 			int frame = 1;
 			int frameX = (frame % 3) * width;
 			int frameY = (frame / 3) * width;
-			g.drawImage(img, field.getPosX(), field.getPosY(), field.getPosX()+width, field.getPosY()+height, frameX, frameY, frameX+width, frameY+height, field.getPlayField());
+			//g.drawImage(img, field.getPosX(), field.getPosY(), field.getPosX()+width, field.getPosY()+height, frameX, frameY, frameX+width, frameY+height, field.getPlayField());
+			g.drawImage(img, 16, 16, field.getPlayField());
 		} catch (IOException ex) {
 			System.out.println(ex);
 		}

@@ -10,29 +10,11 @@ package Model;
  */
 public class Settings {
 	
-	private int playfieldWidth;
-	private int playfieldHeight;
-	private int boxPercentage;
-	private int rockPercentage;
-	private int happerAmount;
+	private static int playfieldDimension = 16;
+	private static int happerAmount = 1;
+	private static String playerName = "Noobie";
 
-	public Settings() {
-		playfieldWidth = 16;
-		playfieldHeight = 16;
-		boxPercentage = 15;
-		rockPercentage = 15;
-		happerAmount = 1;
-	}
-	
-	public int getBoxPercentage() {
-		return boxPercentage;
-	}
-
-	public void setBoxPercentage(int boxPercentage) {
-		this.boxPercentage = boxPercentage;
-	}
-	
-	public int getHapperAmount() {
+	public static int getHapperAmount() {
 		return happerAmount;
 	}
 
@@ -40,27 +22,19 @@ public class Settings {
 		this.happerAmount = happerAmount;
 	}
 
-	public int getRockPercentage() {
-		return rockPercentage;
+	public String getPlayerName() {
+		return playerName;
 	}
 
-	public void setRockPercentage(int rockPercentage) {
-		this.rockPercentage = rockPercentage;
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
 	}
 
-	public int getPlayfieldHeight() {
-		return playfieldHeight;
+	public int getPlayfieldDimension() {
+		return playfieldDimension;
 	}
 
-	public void setPlayfieldHeight(int playfieldHeight) {
-		this.playfieldHeight = playfieldHeight;
-	}
-
-	public int getPlayfieldWidth() {
-		return playfieldWidth;
-	}
-
-	public void setPlayfieldWidth(int playfieldWidth) {
-		this.playfieldWidth = playfieldWidth;
+	public void setPlayfieldDimension(int playfieldDimension) {
+		this.playfieldDimension = playfieldDimension;
 	}
 }

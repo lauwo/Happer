@@ -11,6 +11,7 @@ package Model;
 public class Rock extends GameObject {
 
 	public Rock(Field field) {
-		super(field, "");
+		super(field, "images/rock.png");
+		field.setGameObject(this);
 	}	
 }

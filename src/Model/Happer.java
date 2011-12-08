@@ -5,31 +5,32 @@
 package Model;
 
 import Components.Direction;
-import View.Playfield;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
+
 /**
  *
  * @author Laurens
  */
-public class Happer extends GameObject implements MoveableObject {
+public class Happer extends MoveableObject {
 	
-	Playfield playField;
-
-    int x;
-    int y;
-	
+	Pathfinder x = new Pathfinder();
 	public Happer(Field field) {
-		super(field, "images/happer.png");
+		super(field);
+		new Timer(500, taskPerformer).start();
 	}
 	
-	@Override
-	public void move(Direction direction) {
-		Field newField = field.getNeighbourField(direction);		
-		newField.setGameObject(field.getGameObject());
-		field.setGameObject(null);
+	public void checkHumanField() {
+		
 	}
+	
+		
+	ActionListener taskPerformer = new ActionListener() {
+		public void actionPerformed(ActionEvent evt) {
+			//int direction = (int)(Math.random() * 3);
+			move(x.findShortestPath(field));
+		}
+	};
+	
 }
