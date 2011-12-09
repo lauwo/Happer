@@ -49,7 +49,6 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		addKeyListener(this);		
 		Logger.log("Playfield loaded.");
 		initiatePlayfield();
-		happer.checkHumanField();
 	}
 
 	private void initiatePlayfield() {
@@ -80,7 +79,7 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		
 	}
 	
-	private Field getRandomField()	{
+	public Field getRandomField()	{
 		int random = (int)Math.round(Math.random() * (rows.size() - 1)) + 1;		
 		ArrayList<Field> randomRow = rows.get(random - 1);
 		Field randomField = null;

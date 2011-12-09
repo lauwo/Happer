@@ -8,9 +8,6 @@ import Components.GameState;
 import Components.Logger;
 import View.Gameframe;
 import View.Playfield;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.Timer;
 
 /**
  *
@@ -21,12 +18,15 @@ public class Game {
 	private Gameframe gameWindow;
 	private Playfield playfield;
 	private GameState gameState;
+	private Human human;
+	private Happer happer;
 	
 	public Game(Gameframe gameWindow) {
 		this.gameWindow = gameWindow;
 		//this.playfield = playfield;
 		gameState = GameState.STOPPED;
 		initPlayfield();
+		//human = new Human(playfield.getRandomField());
 		initGameWindow();
 		Logger.log("Game initialised.");
 	}
@@ -39,10 +39,11 @@ public class Game {
 		Logger.log("GameWindow initialised.");
 	}
 	
-	private void initPlayfield()
-	{
+	private void initPlayfield() {
        playfield = new Playfield(20);
        Logger.log("Playfield initialised.");
+	   //playfield.addGameObject(new Human());
+	   //playfield.addGameObject(human);
 	}
 
 	public Playfield getPlayfield() {

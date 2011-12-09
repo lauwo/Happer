@@ -15,7 +15,6 @@ import javax.swing.Timer;
  */
 public class Happer extends MoveableObject {
 	
-	Pathfinder x = new Pathfinder();
 	public Happer(Field field) {
 		super(field);
 		new Timer(500, taskPerformer).start();
@@ -28,8 +27,11 @@ public class Happer extends MoveableObject {
 		
 	ActionListener taskPerformer = new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
-			//int direction = (int)(Math.random() * 3);
-			move(x.findShortestPath(field));
+			Direction moveDirection = Pathfinder.findShortestPath(field);
+			if (field.getNeighbourField(moveDirection).getGameObject() instanceof Human) {
+				System.out.println("Human is: " + moveDirection.name());
+			}
+			move(moveDirection);
 		}
 	};
 	
