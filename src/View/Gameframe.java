@@ -10,6 +10,7 @@
  */
 package View;
 
+import Components.GameState;
 import Components.Logger;
 import Model.Game;
 import java.awt.BorderLayout;
@@ -24,8 +25,8 @@ public class Gameframe extends javax.swing.JFrame {
 	/** Creates new form Gameframe */
 	public Gameframe() {
 		initComponents();
-		Logger.log("Gameframe loaded.");
 		jPlayfieldPanel.setLayout(new BorderLayout());
+		Logger.log("Gameframe loaded.");
         game = new Game(this);
 	}
 
@@ -39,35 +40,126 @@ public class Gameframe extends javax.swing.JFrame {
     private void initComponents() {
 
         jPlayfieldPanel = new javax.swing.JPanel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jItemStart = new javax.swing.JMenuItem();
+        jItemPause = new javax.swing.JMenuItem();
+        jItemStop = new javax.swing.JMenuItem();
+        jItemReset = new javax.swing.JMenuItem();
+        jItemOptions = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
-        setMinimumSize(new java.awt.Dimension(520, 520));
+        setMinimumSize(null);
+
+        jPlayfieldPanel.setPreferredSize(new java.awt.Dimension(10, 10));
 
         javax.swing.GroupLayout jPlayfieldPanelLayout = new javax.swing.GroupLayout(jPlayfieldPanel);
         jPlayfieldPanel.setLayout(jPlayfieldPanelLayout);
         jPlayfieldPanelLayout.setHorizontalGroup(
             jPlayfieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 463, Short.MAX_VALUE)
+            .addGap(0, 444, Short.MAX_VALUE)
         );
         jPlayfieldPanelLayout.setVerticalGroup(
             jPlayfieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 306, Short.MAX_VALUE)
+            .addGap(0, 285, Short.MAX_VALUE)
         );
+
+        jMenu1.setText("Game");
+
+        jItemStart.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F2, 0));
+        jItemStart.setText("Start");
+        jItemStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jItemStartActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jItemStart);
+
+        jItemPause.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F3, 0));
+        jItemPause.setText("Pause");
+        jItemPause.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jItemPauseActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jItemPause);
+
+        jItemStop.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, 0));
+        jItemStop.setText("Stop");
+        jItemStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jItemStopActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jItemStop);
+
+        jItemReset.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F5, 0));
+        jItemReset.setText("Reset");
+        jItemReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jItemResetActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jItemReset);
+
+        jItemOptions.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F10, 0));
+        jItemOptions.setText("Options");
+        jItemOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jItemOptionsActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jItemOptions);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("About");
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPlayfieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPlayfieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPlayfieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPlayfieldPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+	private void jItemStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemStartActionPerformed
+		game.start();
+	}//GEN-LAST:event_jItemStartActionPerformed
+
+	private void jItemStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemStopActionPerformed
+		game.stop();
+	}//GEN-LAST:event_jItemStopActionPerformed
+
+	private void jItemResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemResetActionPerformed
+		game.reset();
+	}//GEN-LAST:event_jItemResetActionPerformed
+
+	private void jItemOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemOptionsActionPerformed
+		game.pause();
+		game.showOptionsPanel();
+	}//GEN-LAST:event_jItemOptionsActionPerformed
+
+	private void jItemPauseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemPauseActionPerformed
+		if (game.getGameState() == GameState.PAUSED) {
+			game.start();
+			jItemPause.setText("Pause");
+		} else {
+			game.pause();
+			jItemPause.setText("Resume");
+		}		
+	}//GEN-LAST:event_jItemPauseActionPerformed
 
 	/**
 	 * @param args the command line arguments
@@ -105,6 +197,14 @@ public class Gameframe extends javax.swing.JFrame {
 		});
 	}
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem jItemOptions;
+    private javax.swing.JMenuItem jItemPause;
+    private javax.swing.JMenuItem jItemReset;
+    private javax.swing.JMenuItem jItemStart;
+    private javax.swing.JMenuItem jItemStop;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
     public javax.swing.JPanel jPlayfieldPanel;
     // End of variables declaration//GEN-END:variables
 }

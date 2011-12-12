@@ -8,7 +8,6 @@ package Components;
  *
  * @author Laurens
  */
-public enum Direction {
-	UP, RIGHT, DOWN, LEFT
+public enum Difficulty {
+	EASY, MEDIUM, HARD
 }
-

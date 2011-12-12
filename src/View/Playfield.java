@@ -14,6 +14,7 @@ import Components.Direction;
 import Components.Logger;
 import Model.Box;
 import Model.Field;
+import Model.Game;
 import Model.Happer;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,17 +34,16 @@ import java.util.Collections;
  */
 public class Playfield extends javax.swing.JPanel implements KeyListener {
 
-	Dimension playFieldSize;
-    ArrayList<ArrayList<Field>> rows;
-	Human human;
-	Happer happer;
+	private Dimension amountOfFields;
+    public ArrayList<ArrayList<Field>> rows;
+	private Game game;
 	
-	public Playfield(int dimension) {
+	public Playfield(int dimension, Game game) {
+		this.game = game;
 		initComponents();
 		setLayout(null);
 		rows = new ArrayList<ArrayList<Field>>();
-		playFieldSize = new Dimension(dimension, dimension);
-        setPreferredSize(playFieldSize);
+		amountOfFields = new Dimension(dimension, dimension);
         setBorder(BorderFactory.createLineBorder(Color.yellow, 1));
 		this.setFocusable(true);
 		addKeyListener(this);		
@@ -54,14 +54,11 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	private void initiatePlayfield() {
 		initFields();
 		setNeighbourFields();
-		addObjects(8, 10);
-		addHuman();
-		addHapper();
 	}
 	
-	private void addObjects(int rockPercentage, int boxPercentage) {
-		int boxesPerRow = (int)Math.round(((double)playFieldSize.width / 100) * boxPercentage);		
-		int rocksPerRow = (int)Math.round(((double)playFieldSize.width / 100) * rockPercentage);
+	public void addGameObjects(int boxPercentage, int rockPercentage) {
+		int boxesPerRow = (int)Math.round(((double)amountOfFields.width / 100) * boxPercentage);		
+		int rocksPerRow = (int)Math.round(((double)amountOfFields.width / 100) * rockPercentage);
 		
 		int total = boxesPerRow + rocksPerRow;
 		
@@ -69,7 +66,7 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 			Collections.shuffle(row);
 			for (int i = 0; i < total; i++) {
 				Field currentField = row.get(i);
-				if (i <= boxesPerRow) {
+				if (i < boxesPerRow) {
 					currentField.setGameObject(new Box(currentField));
 				} else {
 					currentField.setGameObject(new Rock(currentField));
@@ -92,14 +89,6 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		}
 		return randomField;		
 	}
-
-	private void addHuman() {				
-		human = new Human(getRandomField());
-	}
-	
-	private void addHapper() {
-		happer = new Happer(getRandomField());
-	}
 	
 	@Override
 	public void paint(Graphics g) {
@@ -108,9 +97,9 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	}
 	
 	public void initFields() {
-		for (int i = 0; i < playFieldSize.width; i++){
+		for (int i = 0; i < amountOfFields.width; i++){
 			ArrayList<Field> row = new ArrayList<Field>();
-			for (int j = 0; j < playFieldSize.height; j++) {
+			for (int j = 0; j < amountOfFields.height; j++) {
 				int posX = j * Field.width;
 				int posY = i * Field.height;
 				Field newField = new Field(posX, posY, this);
@@ -121,20 +110,10 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	}
 	
     protected void paintBackground(Graphics g) {
-		g.setColor(Color.BLACK);
 		for (ArrayList<Field> row : rows) {
 			for (Field field : row) {
 				if (field.getGameObject() != null) {
-					if (field.getGameObject() instanceof Box)
-						g.setColor(Color.BLUE);
-					else if (field.getGameObject() instanceof Happer)
-						g.setColor(Color.RED);
-					else if (field.getGameObject() instanceof Rock)
-						g.setColor(Color.BLACK);
-					else if (field.getGameObject() instanceof Human)
-						g.setColor(Color.GREEN);
-
-					g.fillRect(field.getPosX(), field.getPosY(), Field.width, Field.height);			
+					field.getGameObject().Draw(g);
 				}
 			}
 		}
@@ -174,9 +153,12 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
  		return null;
 	}
 
+	public Game getGame() {
+		return game;
+	}	
+
     @Override
-    public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h)
-	{
+    public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
         super.imageUpdate(img, flags, x, y, w, h);
         repaint();
         return true;
@@ -211,16 +193,16 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	public void keyPressed(KeyEvent e) {
 		 switch(e.getKeyCode()){
             case KeyEvent.VK_DOWN:
-                 human.move(Direction.DOWN);
+                 game.getHuman().move(Direction.DOWN);
                 break;
             case KeyEvent.VK_UP:
-				human.move(Direction.UP);
+				game.getHuman().move(Direction.UP);
                 break;
             case KeyEvent.VK_RIGHT:
-                 human.move(Direction.RIGHT);
+                 game.getHuman().move(Direction.RIGHT);
                 break;
             case KeyEvent.VK_LEFT:
-                 human.move(Direction.LEFT);
+                 game.getHuman().move(Direction.LEFT);
                 break;
         default:
             break;

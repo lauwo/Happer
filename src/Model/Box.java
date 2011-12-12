@@ -10,9 +10,34 @@ import Components.Direction;
  *
  * @author Laurens
  */
-public class Box extends MoveableObject {
+public class Box extends GameObject implements MoveableObject {
 	
 	public Box(Field field) {
-		super(field);
+		super(field, "");
+	}
+	
+	public boolean move(Direction direction) {
+		Field newField = getField().getNeighbourField(direction);				
+		if (newField != null) {
+			if (newField.getGameObject() != null) {
+				if (newField.getGameObject() instanceof Box) {
+					Box box = (Box)newField.getGameObject();
+					if (box.move(direction)) {
+						newField.setGameObject(getField().getGameObject());
+						getField().setGameObject(null);
+						setField(newField);
+						getField().getPlayField().updateUI();
+						return true;
+					}
+				}				
+			} else  {
+				newField.setGameObject(getField().getGameObject());
+				getField().setGameObject(null);
+				setField(newField);
+				getField().getPlayField().updateUI();
+				return true;
+			}
+		}
+		return false;
 	}
 }

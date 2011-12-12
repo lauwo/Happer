@@ -6,6 +6,7 @@ package Model;
 
 import Components.Direction;
 import View.Playfield;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -17,8 +18,8 @@ public class Field {
 
 	private int posX;
 	private int posY;
-	public static int width = 24;
-	public static int height = 24;
+	public static int width = 26;
+	public static int height = 26;
 	
 	private Playfield playfield;
 	
@@ -88,5 +89,19 @@ public class Field {
 		}
 		
 		return null;
+	}
+	
+	public ArrayList<Field> getEmptyNeighbourFields() {
+		ArrayList<Field> emptyNeighbours = new ArrayList<Field>();		
+		Iterator it = neighbourFields.values().iterator();
+		
+		while (it.hasNext()) {
+			Field neighbourField = (Field)it.next();
+			if (!neighbourField.hasGameObject()) {
+				emptyNeighbours.add(neighbourField);
+			}
+		}
+		
+		return emptyNeighbours;
 	}
 }

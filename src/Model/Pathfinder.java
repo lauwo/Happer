@@ -39,27 +39,28 @@ public abstract class Pathfinder {
 				while (it.hasNext()) {
 					Field neighbourField = (Field)it.next();
 					if (!checkedFields.contains(neighbourField)) {
-						if (!neighbourField.hasGameObject()) {
+						if (!neighbourField.hasGameObject() || neighbourField.getGameObject() instanceof Human) {
 							ArrayList<Field> newRoute = new ArrayList<Field>(shortestRoute);
 							newRoute.add(neighbourField);
 							possibleRoutes.add(newRoute);
-						} else if (neighbourField.getGameObject() instanceof Human) {
-							ArrayList<Field> newRoute = new ArrayList<Field>(shortestRoute);
-							newRoute.add(neighbourField);
-							possibleRoutes.add(newRoute);
-							humanRouteFound = true;	
-							System.out.println(currentField.getNeighbourDirection(newRoute.get(1)).name());
-							return currentField.getNeighbourDirection(newRoute.get(1));
+							if (neighbourField.getGameObject() instanceof Human) {
+								humanRouteFound = true;	
+								return currentField.getNeighbourDirection(newRoute.get(1));
+							}
 						}
 						checkedFields.add(neighbourField);
 					}
 				}
 				possibleRoutes.remove(shortestRoute);			
 			}
-		}
+		}		
 		
-		int direction = (int)(Math.random() * 3);
- 		return Direction.values()[direction];
-	}
-
+		ArrayList<Field> emptyNeighbourFields = currentField.getEmptyNeighbourFields();
+		if (!emptyNeighbourFields.isEmpty()) {
+			int random = (int)(Math.random() * emptyNeighbourFields.size()) + 1;
+			return currentField.getNeighbourDirection(emptyNeighbourFields.get(random - 1));
+		} else {
+			return null;
+		}
+	}	
 }
