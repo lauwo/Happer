@@ -49,6 +49,22 @@ public class Field {
 		this.posY = posY;
 	}
 
+	public static int getHeight() {
+		return height;
+	}
+
+	public static void setHeight(int height) {
+		Field.height = height;
+	}
+
+	public static int getWidth() {
+		return width;
+	}
+
+	public static void setWidth(int width) {
+		Field.width = width;
+	}
+
 	public GameObject getGameObject() {
 		return gameObject;
 	}

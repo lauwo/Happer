@@ -58,4 +58,12 @@ public abstract class GameObject {
 	public void setField(Field field) {
 		this.field = field;
 	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
 }

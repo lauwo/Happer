@@ -12,6 +12,7 @@ import View.Playfield;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
 /**
@@ -37,6 +38,7 @@ public class Game {
 		difficulty = Difficulty.EASY;
 		playfieldDimension = 20;
 		gameTimer = new Timer(800, gameTimeActions);
+		gameTimer.setInitialDelay(0);
 		this.gameWindow = gameWindow;
 		gameState = GameState.STOPPED;
 		initPlayfield(playfieldDimension, boxPercentage, rockPercentage, difficulty);
@@ -54,13 +56,13 @@ public class Game {
 		playfield = new Playfield(fieldDimension, this);
 		gameWindow.setPreferredSize(dimension);
 		playfield.addGameObjects(boxPercentage, rockPercentage);
-		human = new Human(playfield.getRandomField());
-		happer = new Happer(playfield.getRandomField());
+		human = new Human(playfield.getRandomEmptyField());
+		happer = new Happer(playfield.getRandomEmptyField());
 		start();
 	}
 
 	private void adjustHapperSpeed() {
-		int happerSpeed = difficulty == Difficulty.HARD ? 300 : difficulty == Difficulty.MEDIUM ? 500 : 800;		
+		int happerSpeed = difficulty == Difficulty.HARD ? 250 : difficulty == Difficulty.MEDIUM ? 500 : 750;		
 		gameTimer.setDelay(happerSpeed);
 	}
 	
@@ -108,7 +110,7 @@ public class Game {
 	
 	ActionListener gameTimeActions = new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
-			happer.move(Pathfinder.findShortestPath(happer.getField()));
+			happer.moveToHuman();
 		}
 	};
 	
@@ -156,5 +158,15 @@ public class Game {
 
 	public void setPlayfieldDimension(int fieldDimension) {
 		this.playfieldDimension = fieldDimension;
+	}
+	
+	public void win() {
+		stop();
+		this.gameState = GameState.WON;
+		gameWindow.jPlayfieldPanel.removeAll();
+	}
+	
+	public void lose() {
+		this.gameState = GameState.LOST;
 	}
 }

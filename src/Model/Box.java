@@ -19,7 +19,7 @@ public class Box extends GameObject implements MoveableObject {
 	public boolean move(Direction direction) {
 		Field newField = getField().getNeighbourField(direction);				
 		if (newField != null) {
-			if (newField.getGameObject() != null) {
+			if (newField.hasGameObject()) {
 				if (newField.getGameObject() instanceof Box) {
 					Box box = (Box)newField.getGameObject();
 					if (box.move(direction)) {

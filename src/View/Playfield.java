@@ -34,16 +34,16 @@ import java.util.Collections;
  */
 public class Playfield extends javax.swing.JPanel implements KeyListener {
 
-	private Dimension amountOfFields;
+	private int playfieldDimension;
     public ArrayList<ArrayList<Field>> rows;
 	private Game game;
 	
 	public Playfield(int dimension, Game game) {
 		this.game = game;
 		initComponents();
+		playfieldDimension = dimension;
 		setLayout(null);
 		rows = new ArrayList<ArrayList<Field>>();
-		amountOfFields = new Dimension(dimension, dimension);
         setBorder(BorderFactory.createLineBorder(Color.yellow, 1));
 		this.setFocusable(true);
 		addKeyListener(this);		
@@ -57,8 +57,8 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	}
 	
 	public void addGameObjects(int boxPercentage, int rockPercentage) {
-		int boxesPerRow = (int)Math.round(((double)amountOfFields.width / 100) * boxPercentage);		
-		int rocksPerRow = (int)Math.round(((double)amountOfFields.width / 100) * rockPercentage);
+		int boxesPerRow = (int)Math.round(((double)playfieldDimension / 100) * boxPercentage);		
+		int rocksPerRow = (int)Math.round(((double)playfieldDimension / 100) * rockPercentage);
 		
 		int total = boxesPerRow + rocksPerRow;
 		
@@ -76,7 +76,7 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		
 	}
 	
-	public Field getRandomField()	{
+	public Field getRandomEmptyField()	{
 		int random = (int)Math.round(Math.random() * (rows.size() - 1)) + 1;		
 		ArrayList<Field> randomRow = rows.get(random - 1);
 		Field randomField = null;
@@ -84,22 +84,16 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		while (randomField == null) {
 			random = (int)Math.round(Math.random() * (randomRow.size() - 1)) + 1;
 			Field field = randomRow.get(random - 1);
-			if (field.getGameObject() == null)
+			if (!field.hasGameObject())
 				randomField = field;
 		}
 		return randomField;		
 	}
 	
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		paintBackground(g);
-	}
-	
 	public void initFields() {
-		for (int i = 0; i < amountOfFields.width; i++){
+		for (int i = 0; i < playfieldDimension; i++){
 			ArrayList<Field> row = new ArrayList<Field>();
-			for (int j = 0; j < amountOfFields.height; j++) {
+			for (int j = 0; j < playfieldDimension; j++) {
 				int posX = j * Field.width;
 				int posY = i * Field.height;
 				Field newField = new Field(posX, posY, this);
@@ -108,16 +102,6 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 			rows.add(row);
 		}
 	}
-	
-    protected void paintBackground(Graphics g) {
-		for (ArrayList<Field> row : rows) {
-			for (Field field : row) {
-				if (field.getGameObject() != null) {
-					field.getGameObject().Draw(g);
-				}
-			}
-		}
-    }
 	
 	public void setNeighbourFields() {
 		for (ArrayList<Field> row : rows) {
@@ -156,6 +140,22 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	public Game getGame() {
 		return game;
 	}	
+	
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		paintBackground(g);
+	}
+	
+    protected void paintBackground(Graphics g) {
+		for (ArrayList<Field> row : rows) {
+			for (Field field : row) {
+				if (field.hasGameObject()) {
+					field.getGameObject().Draw(g);
+				}
+			}
+		}
+    }
 
     @Override
     public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
@@ -185,12 +185,17 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
     // End of variables declaration//GEN-END:variables
 
 	@Override
-	public void keyTyped(KeyEvent ke) {
-		
+	public void keyTyped(KeyEvent e) {
+	
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
+
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
 		 switch(e.getKeyCode()){
             case KeyEvent.VK_DOWN:
                  game.getHuman().move(Direction.DOWN);
@@ -207,10 +212,5 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
         default:
             break;
         }   
-	}
-
-	@Override
-	public void keyReleased(KeyEvent ke) {
-		
 	}
 }

@@ -13,10 +13,11 @@ import java.util.Iterator;
  *
  * @author Laurens
  */
-public abstract class Pathfinder {
+public class Pathfinder {
 	
-	public static Direction findShortestPath(Field currentField) {
-		
+	private Pathfinder(){};
+	
+	public static Direction findShortestPath(Field currentField) {		
 		ArrayList<ArrayList<Field>> possibleRoutes = new ArrayList<ArrayList<Field>>();
 		HashSet<Field> checkedFields = new HashSet<Field>();
 				
