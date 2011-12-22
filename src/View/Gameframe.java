@@ -40,7 +40,7 @@ public class Gameframe extends javax.swing.JFrame {
     private void initComponents() {
 
         jPlayfieldPanel = new javax.swing.JPanel();
-        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenuBar = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jItemStart = new javax.swing.JMenuItem();
         jItemPause = new javax.swing.JMenuItem();
@@ -52,8 +52,6 @@ public class Gameframe extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
         setMinimumSize(null);
-
-        jPlayfieldPanel.setPreferredSize(new java.awt.Dimension(10, 10));
 
         javax.swing.GroupLayout jPlayfieldPanelLayout = new javax.swing.GroupLayout(jPlayfieldPanel);
         jPlayfieldPanel.setLayout(jPlayfieldPanelLayout);
@@ -113,29 +111,31 @@ public class Gameframe extends javax.swing.JFrame {
         });
         jMenu1.add(jItemOptions);
 
-        jMenuBar1.add(jMenu1);
+        jMenuBar.add(jMenu1);
 
         jMenu2.setText("About");
-        jMenuBar1.add(jMenu2);
+        jMenuBar.add(jMenu2);
 
-        setJMenuBar(jMenuBar1);
+        setJMenuBar(jMenuBar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPlayfieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
+            .addComponent(jPlayfieldPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPlayfieldPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+            .addComponent(jPlayfieldPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
 	private void jItemStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemStartActionPerformed
-		game.start();
+		if (game.getState() == GameState.STOPPED) {
+			game.start();
+		}
 	}//GEN-LAST:event_jItemStartActionPerformed
 
 	private void jItemStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemStopActionPerformed
@@ -147,15 +147,14 @@ public class Gameframe extends javax.swing.JFrame {
 	}//GEN-LAST:event_jItemResetActionPerformed
 
 	private void jItemOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemOptionsActionPerformed
-		game.pause();
 		game.showOptionsPanel();
 	}//GEN-LAST:event_jItemOptionsActionPerformed
 
 	private void jItemPauseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemPauseActionPerformed
-		if (game.getGameState() == GameState.PAUSED) {
-			game.start();
+		if (game.getState() == GameState.PAUSED) {
+			game.resume();
 			jItemPause.setText("Pause");
-		} else {
+		} else if (game.getState() == GameState.STARTED) {
 			game.pause();
 			jItemPause.setText("Resume");
 		}		
@@ -204,7 +203,7 @@ public class Gameframe extends javax.swing.JFrame {
     private javax.swing.JMenuItem jItemStop;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuBar jMenuBar;
     public javax.swing.JPanel jPlayfieldPanel;
     // End of variables declaration//GEN-END:variables
 }

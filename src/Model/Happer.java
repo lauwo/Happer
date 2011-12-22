@@ -5,6 +5,9 @@
 package Model;
 
 import Components.Direction;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 /**
  *
@@ -12,9 +15,16 @@ import Components.Direction;
  */
 public class Happer extends GameObject implements MoveableObject {
 
-	public Happer(Field field) {
+	private Game game;
+	private Timer timer;
+	
+	public Happer(Field field, Game game, int speed) {
 		super(field, "");
+		this.game = game;
 		field.setGameObject(this);
+		timer = new Timer(speed, gameTimeActions);
+		timer.setInitialDelay(0);
+		timer.start();
 	}
 	
 	public void moveToHuman() {
@@ -23,7 +33,8 @@ public class Happer extends GameObject implements MoveableObject {
 	
 	public boolean move(Direction direction) {
 		if (getField().getEmptyNeighbourFields().isEmpty()) {
-			getField().getPlayField().getGame().win();
+			game.win();
+			timer.stop();
 		}
 		Field newField = getField().getNeighbourField(direction);				
 		if (newField != null) {
@@ -31,16 +42,32 @@ public class Happer extends GameObject implements MoveableObject {
 				newField.setGameObject(getField().getGameObject());
 				getField().setGameObject(null);
 				setField(newField);
-				getField().getPlayField().updateUI();
+				game.getPlayfield().updateUI();
 				return true;
 			} else if (newField.getGameObject() instanceof Human) {
 				catchHuman();
+				timer.stop();
 			}
 		}
 		return false;
 	}
 	
 	public void catchHuman() {
-		getField().getPlayField().getGame().lose();
+		game.lose();
+	}
+	
+		
+	ActionListener gameTimeActions = new ActionListener() {
+		public void actionPerformed(ActionEvent evt) {
+			moveToHuman();
+		}
+	};
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
 	}
 }

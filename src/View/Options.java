@@ -103,6 +103,10 @@ public class Options extends javax.swing.JPanel {
         sliderDimension = new javax.swing.JSlider();
         lblDimension = new javax.swing.JLabel();
 
+        setMaximumSize(new java.awt.Dimension(260, 265));
+        setMinimumSize(new java.awt.Dimension(260, 265));
+        setPreferredSize(new java.awt.Dimension(260, 323));
+
         btnRock10.setText("10%");
 
         btnRock15.setText("15%");
@@ -232,7 +236,7 @@ public class Options extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 	private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-		game.showPlayfieldPanel();
+		game.resume();
 	}//GEN-LAST:event_btnCancelActionPerformed
 
 	private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed

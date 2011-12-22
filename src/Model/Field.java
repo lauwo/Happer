@@ -20,17 +20,14 @@ public class Field {
 	private int posY;
 	public static int width = 26;
 	public static int height = 26;
-	
-	private Playfield playfield;
-	
+
 	private GameObject gameObject;
 	private HashMap<Direction, Field> neighbourFields;
 	
-	public Field(int posX, int posY, Playfield playfield) {
+	public Field(int posX, int posY) {
 		this.posX = posX;
 		this.posY = posY;
 		this.neighbourFields = new HashMap<Direction, Field>();
-		this.playfield = playfield;
 	}
 
 	public int getPosX() {
@@ -84,10 +81,6 @@ public class Field {
 	
 	public Field getNeighbourField(Direction direction) {
 		return neighbourFields.get(direction);
-	}
-	
-	public Playfield getPlayField() {
-		return this.playfield;
 	}
 
 	public HashMap<Direction, Field> getNeighbourFields() {

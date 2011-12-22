@@ -15,12 +15,9 @@ import Components.Logger;
 import Model.Box;
 import Model.Field;
 import Model.Game;
-import Model.Happer;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
-import Model.Human;
 import Model.Rock;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -37,6 +34,7 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	private int playfieldDimension;
     public ArrayList<ArrayList<Field>> rows;
 	private Game game;
+	boolean currentlyMoving = false;
 	
 	public Playfield(int dimension, Game game) {
 		this.game = game;
@@ -96,7 +94,7 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 			for (int j = 0; j < playfieldDimension; j++) {
 				int posX = j * Field.width;
 				int posY = i * Field.height;
-				Field newField = new Field(posX, posY, this);
+				Field newField = new Field(posX, posY);
 				row.add(newField);			
 			}			
 			rows.add(row);
@@ -191,26 +189,30 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-
+		if (!currentlyMoving) {
+			currentlyMoving = true;
+			 switch(e.getKeyCode())	{
+				case KeyEvent.VK_DOWN:
+					 game.getHuman().move(Direction.DOWN);
+					break;
+				case KeyEvent.VK_UP:
+					game.getHuman().move(Direction.UP);
+					break;
+				case KeyEvent.VK_RIGHT:
+					 game.getHuman().move(Direction.RIGHT);
+					break;
+				case KeyEvent.VK_LEFT:
+					 game.getHuman().move(Direction.LEFT);
+					break;
+				default:
+					
+				break;
+			}   
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		 switch(e.getKeyCode()){
-            case KeyEvent.VK_DOWN:
-                 game.getHuman().move(Direction.DOWN);
-                break;
-            case KeyEvent.VK_UP:
-				game.getHuman().move(Direction.UP);
-                break;
-            case KeyEvent.VK_RIGHT:
-                 game.getHuman().move(Direction.RIGHT);
-                break;
-            case KeyEvent.VK_LEFT:
-                 game.getHuman().move(Direction.LEFT);
-                break;
-        default:
-            break;
-        }   
+		currentlyMoving = false;
 	}
 }

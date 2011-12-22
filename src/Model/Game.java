@@ -9,11 +9,9 @@ import Components.GameState;
 import View.Gameframe;
 import View.Options;
 import View.Playfield;
+import View.StartPanel;
+import View.StatusPanel;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JPanel;
-import javax.swing.Timer;
 
 /**
  *
@@ -24,46 +22,45 @@ public class Game {
 	private Gameframe gameWindow;
 	private Playfield playfield;
 	private GameState gameState;
-	private Human human;
-	private Happer happer;
-	private Timer gameTimer;
 	private int playfieldDimension;
 	private int boxPercentage;
 	private int rockPercentage;
 	private Difficulty difficulty;
+	private Human human;
+	private Happer happer;
 	
 	public Game(Gameframe gameWindow) {
 		boxPercentage = 20;
 		rockPercentage = 10;
 		difficulty = Difficulty.EASY;
 		playfieldDimension = 20;
-		gameTimer = new Timer(800, gameTimeActions);
-		gameTimer.setInitialDelay(0);
 		this.gameWindow = gameWindow;
 		gameState = GameState.STOPPED;
-		initPlayfield(playfieldDimension, boxPercentage, rockPercentage, difficulty);
 		initGameWindow();
 	}
 	
 	private void initGameWindow() {
-		gameWindow.jPlayfieldPanel.add(playfield);
-		playfield.setRequestFocusEnabled(true);
+		StartPanel startPanel = new StartPanel(this);
+		gameWindow.jPlayfieldPanel.add(startPanel);
+		gameWindow.setResizable(false);
+		gameWindow.setPreferredSize(startPanel.getPreferredSize());
 		gameWindow.pack();
 	}
 	
 	private void initPlayfield(int fieldDimension, int boxPercentage, int rockPercentage, Difficulty difficulty) {
 		Dimension dimension = new Dimension(fieldDimension * Field.width + 16, fieldDimension * Field.height + 58);
+		this.playfield = null;
+		if (happer != null)
+			happer.getTimer().stop();
+		happer = null;
+		human = null;
 		playfield = new Playfield(fieldDimension, this);
-		gameWindow.setPreferredSize(dimension);
+		gameWindow.setSize(dimension);
 		playfield.addGameObjects(boxPercentage, rockPercentage);
-		human = new Human(playfield.getRandomEmptyField());
-		happer = new Happer(playfield.getRandomEmptyField());
-		start();
-	}
-
-	private void adjustHapperSpeed() {
-		int happerSpeed = difficulty == Difficulty.HARD ? 250 : difficulty == Difficulty.MEDIUM ? 500 : 750;		
-		gameTimer.setDelay(happerSpeed);
+		int happerSpeed = difficulty == Difficulty.HARD ? 250 : difficulty == Difficulty.MEDIUM ? 500 : 750;
+		happer = new Happer(playfield.getRandomEmptyField(), this, happerSpeed);
+		human = new Human(playfield.getRandomEmptyField(), this);
+		resume();
 	}
 	
 	public Playfield getPlayfield() {
@@ -73,59 +70,51 @@ public class Game {
 	public void pause() {
 		gameState = gameState.PAUSED;
 		playfield.setEnabled(false);
-	    gameTimer.stop();
+	    happer.getTimer().stop();
+		showStatusPanel();
 	}
 	
 	public void start() {
 		gameState = gameState.STARTED;
+		gameWindow.jPlayfieldPanel.removeAll();
+		initPlayfield(playfieldDimension, boxPercentage, rockPercentage, difficulty);
+		gameWindow.jPlayfieldPanel.add(playfield);
+		playfield.setRequestFocusEnabled(true);
+	}
+	
+	public void resume() {
+		gameState = gameState.STARTED;
+		restorePlayfield();
 		playfield.setEnabled(true);
-		gameTimer.start();
+		happer.getTimer().start();
 		playfield.requestFocus();
 	}
 	
 	public void reset() {
 		gameWindow.jPlayfieldPanel.removeAll();
 		initPlayfield(playfieldDimension, boxPercentage, rockPercentage, difficulty);
-		initGameWindow();
-		adjustHapperSpeed();
+		start();
 		playfield.requestFocus();
 	}
 	
 	public void stop() {
-		gameState = gameState.STOPPED;
 		pause();
+		gameState = gameState.STOPPED;
+		showStatusPanel();
 	}
 
-	public GameState getGameState() {
+	public GameState getState() {
 		return gameState;
 	}
-
-	public Happer getHapper() {
-		return happer;
-	}
-
-	public Human getHuman() {
-		return human;
-	}
-	
-	ActionListener gameTimeActions = new ActionListener() {
-		public void actionPerformed(ActionEvent evt) {
-			happer.moveToHuman();
-		}
-	};
 	
 	public void showOptionsPanel() {
-		pause();
+		if (getState() == GameState.STARTED)
+			pause();
+			
 		Options optionsPanel = new Options(this);
-		playfield.setVisible(false);
-		gameWindow.jPlayfieldPanel.add(optionsPanel);
-	}
-	
-	public void showPlayfieldPanel() {
 		gameWindow.jPlayfieldPanel.removeAll();
-		gameWindow.jPlayfieldPanel.add(playfield);
-		playfield.setVisible(true);
-		start();
+		gameWindow.jPlayfieldPanel.add(optionsPanel);
+		gameWindow.setSize(optionsPanel.getPreferredSize());
 	}
 
 	public int getBoxPercentage() {
@@ -163,10 +152,31 @@ public class Game {
 	public void win() {
 		stop();
 		this.gameState = GameState.WON;
-		gameWindow.jPlayfieldPanel.removeAll();
+		showStatusPanel();
 	}
 	
 	public void lose() {
+		stop();
 		this.gameState = GameState.LOST;
+		showStatusPanel();
+	}
+	
+	public Human getHuman() {
+		return human;
+	}
+	
+	private void showStatusPanel() {
+		gameWindow.jPlayfieldPanel.removeAll();
+		gameWindow.jPlayfieldPanel.add(new StatusPanel(this));
+		Dimension statusDimension = new Dimension(400, 400);
+		gameWindow.setSize(statusDimension);
+	}
+	
+	public void restorePlayfield() {
+		gameWindow.jPlayfieldPanel.removeAll();
+		gameWindow.jPlayfieldPanel.add(playfield);
+		playfield.setVisible(true);
+		Dimension dimension = new Dimension(playfieldDimension * Field.width + 16, playfieldDimension * Field.height + 58);
+		gameWindow.setSize(dimension);
 	}
 }

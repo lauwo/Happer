@@ -11,8 +11,11 @@ import Components.Direction;
  */
 public class Human extends GameObject implements MoveableObject {
 	
-	public Human(Field field) {
+	private Game game;
+	
+	public Human(Field field, Game game) {
 		super(field, "");
+		this.game = game;
 		field.setGameObject(this);
 	}
 	
@@ -26,7 +29,7 @@ public class Human extends GameObject implements MoveableObject {
 						newField.setGameObject(getField().getGameObject());
 						getField().setGameObject(null);
 						setField(newField);
-						getField().getPlayField().updateUI();
+						game.getPlayfield().updateUI();
 						return true;
 					}
 				}				
@@ -34,7 +37,7 @@ public class Human extends GameObject implements MoveableObject {
 				newField.setGameObject(getField().getGameObject());
 				getField().setGameObject(null);
 				setField(newField);
-				getField().getPlayField().updateUI();
+				game.getPlayfield().updateUI();
 				return true;
 			}
 		}

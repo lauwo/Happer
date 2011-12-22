@@ -26,7 +26,6 @@ public class Box extends GameObject implements MoveableObject {
 						newField.setGameObject(getField().getGameObject());
 						getField().setGameObject(null);
 						setField(newField);
-						getField().getPlayField().updateUI();
 						return true;
 					}
 				}				
@@ -34,7 +33,6 @@ public class Box extends GameObject implements MoveableObject {
 				newField.setGameObject(getField().getGameObject());
 				getField().setGameObject(null);
 				setField(newField);
-				getField().getPlayField().updateUI();
 				return true;
 			}
 		}
