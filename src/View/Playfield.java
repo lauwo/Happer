@@ -38,7 +38,13 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
     public ArrayList<ArrayList<Field>> rows;
 	private Game game;
 	boolean currentlyMoving = false;
-	
+	BufferedImage road;
+	BufferedImage grass;
+	BufferedImage grassTop;
+	BufferedImage grassUnder;
+	BufferedImage grassRight;
+	BufferedImage grassLeft;
+
 	public Playfield(int dimension, Game game) {
 		this.game = game;
 		initComponents();
@@ -49,11 +55,25 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		this.setFocusable(true);
 		addKeyListener(this);
 		initiatePlayfield();
+		loadImages();
 	}
 
 	private void initiatePlayfield() {
 		initFields();
 		setNeighbourFields();
+	}
+	
+	private void loadImages() {
+		try {
+			 road = ImageIO.read(new File("images/grond/asfalt.png"));
+			 grass = ImageIO.read(new File("images/grond/gras.png"));
+			 grassTop = ImageIO.read(new File("images/grond/grasboven.png"));
+			 grassUnder = ImageIO.read(new File("images/grond/grasonder.png"));
+			 grassRight = ImageIO.read(new File("images/grond/grasrechts.png"));
+			 grassLeft = ImageIO.read(new File("images/grond/graslinks.png"));
+		} catch (IOException ex) {
+			System.out.println(ex);
+		}
 	}
 	
 	public void addGameObjects(int boxPercentage, int rockPercentage) {
@@ -152,59 +172,49 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	}
 	
     protected void paintBackground(Graphics g) {
-		try {
-			BufferedImage road = ImageIO.read(new File("images/grond/asfalt.png"));
-			BufferedImage grass = ImageIO.read(new File("images/grond/gras.png"));
-			BufferedImage grassTop = ImageIO.read(new File("images/grond/grasboven.png"));
-			BufferedImage grassUnder = ImageIO.read(new File("images/grond/grasonder.png"));
-			BufferedImage grassRight = ImageIO.read(new File("images/grond/grasrechts.png"));
-			BufferedImage grassLeft = ImageIO.read(new File("images/grond/graslinks.png"));
-			for (ArrayList<Field> row : rows) {
-				for (Field field : row) {
-					g.drawImage(road, field.getPosX(), field.getPosY(), this);
-					if (field.hasGameObject()) {
-						if (field.getGameObject() instanceof Rock) {								
-							g.drawImage(grass, field.getPosX(), field.getPosY(), this);
-						}								
-					}
-					for (Field neighbour : field.getNeighbourFields().values()) {
-						if (neighbour.hasGameObject()) {
-							if (neighbour.getGameObject() instanceof Rock) {
-								Image grassToApply = null;
-								int x = field.getPosX();
-								int y = field.getPosY();
-								switch (field.getNeighbourDirection(neighbour)) {
-									case UP:
-										grassToApply = grassTop;										
-										break;
-									case DOWN:
-										grassToApply = grassUnder;
-										y = y + 23;
-										break;
-									case LEFT:
-										grassToApply = grassLeft;
-										break;
-									case RIGHT:
-										grassToApply = grassRight;
-										x = x + 23;
-										break;
-								}
-								g.drawImage(grassToApply, x, y, this);
+		for (ArrayList<Field> row : rows) {
+			for (Field field : row) {
+				g.drawImage(road, field.getPosX(), field.getPosY(), this);
+				if (field.hasGameObject()) {
+					if (field.getGameObject() instanceof Rock) {								
+						g.drawImage(grass, field.getPosX(), field.getPosY(), this);
+					}								
+				}
+				for (Field neighbour : field.getNeighbourFields().values()) {
+					if (neighbour.hasGameObject()) {
+						if (neighbour.getGameObject() instanceof Rock) {
+							Image grassToApply = null;
+							int x = field.getPosX();
+							int y = field.getPosY();
+							switch (field.getNeighbourDirection(neighbour)) {
+								case UP:
+									grassToApply = grassTop;										
+									break;
+								case DOWN:
+									grassToApply = grassUnder;
+									y = y + 23;
+									break;
+								case LEFT:
+									grassToApply = grassLeft;
+									break;
+								case RIGHT:
+									grassToApply = grassRight;
+									x = x + 23;
+									break;
 							}
-						}			
-					}
-					if (field.hasGameObject()) {
-						try {
-							BufferedImage img = ImageIO.read(new File(field.getGameObject().getImage()));
-							g.drawImage(img, field.getPosX(), field.getPosY(), this);
-						} catch (IOException ex) {
-
+							g.drawImage(grassToApply, x, y, this);
 						}
+					}			
+				}
+				if (field.hasGameObject()) {
+					try {
+						BufferedImage img = ImageIO.read(new File(field.getGameObject().getImage()));
+						g.drawImage(img, field.getPosX(), field.getPosY(), this);
+					} catch (IOException ex) {
+
 					}
 				}
 			}
-		} catch (IOException ex) {
-			System.out.println(ex);
 		}
     }
 

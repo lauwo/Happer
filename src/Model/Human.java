@@ -18,6 +18,7 @@ public class Human extends GameObject implements MoveableObject {
 	private Game game;
 	private HumanState status;
 	private Timer immunityTimer;
+	private Direction currentDirection;
 	
 	public Human(Field field, Game game) {
 		super(field, "images/mens/onder.png");
@@ -25,24 +26,13 @@ public class Human extends GameObject implements MoveableObject {
 		field.setGameObject(this);
 		this.status = HumanState.NORMAL;
 		immunityTimer = new Timer(5000, removeImmunity);
+		currentDirection = Direction.DOWN;
 	}
 	
 	public boolean move(Direction direction) {
-		if (direction != null) {		
-			switch (direction) {
-				case LEFT:
-					super.setImage("images/mens/links.png");
-				break;
-				case RIGHT:
-					super.setImage("images/mens/rechts.png");
-				break;
-				case DOWN:
-					super.setImage("images/mens/onder.png");
-				break;
-				case UP:
-					super.setImage("images/mens/boven.png");
-				break;
-			}
+		if (direction != null) {
+			currentDirection = direction;
+			setCorrectImage();
 		}
 		Field newField = getField().getNeighbourField(direction);				
 		if (newField != null) {
@@ -78,12 +68,14 @@ public class Human extends GameObject implements MoveableObject {
 	}
 	
 	public void becomeImmune() {
-		this.status = HumanState.IMMUNE;		
+		this.status = HumanState.IMMUNE;
+		setCorrectImage();
 		immunityTimer.restart();
 	}
 	
 	public void removeImmunity() {
 		this.status = HumanState.NORMAL;
+		setCorrectImage();
 	}
 	
 	ActionListener removeImmunity = new ActionListener() {
@@ -95,5 +87,35 @@ public class Human extends GameObject implements MoveableObject {
 	
 	public boolean isImmune() {
 		return this.status == HumanState.IMMUNE;
+	}
+	
+	public void setCorrectImage() {
+		switch (currentDirection) {
+			case LEFT:
+			if (status == HumanState.IMMUNE)
+				super.setImage("images/mens/linksshield.png");
+			else
+				super.setImage("images/mens/links.png");
+			break;
+			case RIGHT:
+			if (status == HumanState.IMMUNE)
+				super.setImage("images/mens/rechtsshield.png");
+			else
+				super.setImage("images/mens/rechts.png");
+			break;
+			case DOWN:
+			if (status == HumanState.IMMUNE)
+				super.setImage("images/mens/ondershield.png");
+			else
+				super.setImage("images/mens/onder.png");
+			break;
+			case UP:
+			if (status == HumanState.IMMUNE)
+				super.setImage("images/mens/bovenshield.png");
+			else
+				super.setImage("images/mens/boven.png");						
+			break;
+		}
+		game.getPlayfield().updateUI();		
 	}
 }

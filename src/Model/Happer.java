@@ -19,9 +19,10 @@ public class Happer extends GameObject implements MoveableObject {
 	private Timer timer;
 	private int initialSpeed;
 	private Timer slowDownTimer;
+	private Direction currentDirection;
 	
 	public Happer(Field field, Game game, int speed) {
-		super(field, "images/happer/autobeneden.png");
+		super(field, "images/happer/beneden.png");
 		this.game = game;
 		this.initialSpeed = speed;
 		field.setGameObject(this);
@@ -29,6 +30,7 @@ public class Happer extends GameObject implements MoveableObject {
 		timer.setInitialDelay(0);
 		timer.start();
 		slowDownTimer = new Timer(5000, slowDownHapper);
+		currentDirection = Direction.DOWN;
 	}
 	
 	public void moveToHuman() {
@@ -36,21 +38,9 @@ public class Happer extends GameObject implements MoveableObject {
 	}
 	
 	public boolean move(Direction direction) {
-		if (direction != null) {		
-			switch (direction) {
-				case LEFT:
-					super.setImage("images/happer/autolinks.png");
-				break;
-				case RIGHT:
-					super.setImage("images/happer/autorechts.png");
-				break;
-				case DOWN:
-					super.setImage("images/happer/autobeneden.png");
-				break;
-				case UP:
-					super.setImage("images/happer/autoboven.png");
-				break;
-			}
+		if (direction != null) {
+			currentDirection = direction;
+			setCorrectImage();
 		}
 		if (getField().getEmptyNeighbourFields().isEmpty()) {
 			timer.stop();
@@ -78,6 +68,36 @@ public class Happer extends GameObject implements MoveableObject {
 		game.lose();
 	}
 	
+	private void setCorrectImage() {
+		switch (currentDirection) {
+			case LEFT:
+			if (slowDownTimer.isRunning())
+				super.setImage("images/happer/linksslow.png");
+			else
+				super.setImage("images/happer/links.png");
+			break;
+			case RIGHT:
+			if (slowDownTimer.isRunning())
+				super.setImage("images/happer/rechtsslow.png");
+			else
+				super.setImage("images/happer/rechts.png");
+			break;
+			case DOWN:
+			if (slowDownTimer.isRunning())
+				super.setImage("images/happer/benedenslow.png");
+			else
+				super.setImage("images/happer/beneden.png");
+			break;
+			case UP:
+			if (slowDownTimer.isRunning())
+				super.setImage("images/happer/bovenslow.png");
+			else
+				super.setImage("images/happer/boven.png");
+			break;
+		}
+		game.getPlayfield().updateUI();
+	}
+	
 		
 	ActionListener happerMovement = new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
@@ -94,14 +114,16 @@ public class Happer extends GameObject implements MoveableObject {
 	}
 	
 	public void slowDown() {
-		timer.setDelay(timer.getDelay() + 250);
+		timer.setDelay(timer.getDelay() * 2);
 		slowDownTimer.restart();
+		setCorrectImage();
 	}
 	
 	ActionListener slowDownHapper = new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
 			timer.setDelay(initialSpeed);
 			((Timer)evt.getSource()).stop();
+			setCorrectImage();
 		}
 	};
 }
