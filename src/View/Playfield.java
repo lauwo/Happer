@@ -22,8 +22,12 @@ import Model.Rock;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -73,20 +77,24 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		}		
 		
 	}
+	/**
+	 * Gets a random field that does not have a game object on it somewhere on the playfield 
+	 * @return Field if a random empty field could be found
+	 */
 	
 	public Field getRandomEmptyField()	{
 		int random = (int)Math.round(Math.random() * (rows.size() - 1)) + 1;		
 		ArrayList<Field> randomRow = rows.get(random - 1);
-		Field randomField = null;
-		
-		while (randomField == null) {
-			random = (int)Math.round(Math.random() * (randomRow.size() - 1)) + 1;
-			Field field = randomRow.get(random - 1);
-			if (!field.hasGameObject())
-				randomField = field;
+
+		random = (int)Math.round(Math.random() * (randomRow.size() - 1)) + 1;
+		Field field = randomRow.get(random - 1);
+		if (!field.hasGameObject()) {
+			return field;
 		}
-		return randomField;		
+	
+		return getRandomEmptyField();		
 	}
+	
 	
 	public void initFields() {
 		for (int i = 0; i < playfieldDimension; i++){
@@ -148,8 +156,60 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
     protected void paintBackground(Graphics g) {
 		for (ArrayList<Field> row : rows) {
 			for (Field field : row) {
+					try {
+						BufferedImage road = ImageIO.read(new File("images/grond/asfalt.png"));
+						g.drawImage(road, field.getPosX(), field.getPosY(), this);
+					} catch (IOException ex) {
+						System.out.println(ex);
+					}
 				if (field.hasGameObject()) {
-					field.getGameObject().Draw(g);
+					try {
+						if (field.getGameObject() instanceof Rock) {
+							BufferedImage grass = ImageIO.read(new File("images/grond/gras.png"));
+							g.drawImage(grass, field.getPosX(), field.getPosY(), this);
+						}				
+					} catch (IOException ex) {
+						System.out.println(ex);
+					}					
+				}
+				for (Field neighbour : field.getNeighbourFields().values()) {
+					if (neighbour.hasGameObject()) {
+						if (neighbour.getGameObject() instanceof Rock) {
+							try {
+								String grassToApply = "";
+								int x = field.getPosX();
+								int y = field.getPosY();
+								switch (field.getNeighbourDirection(neighbour)) {
+									case UP:
+										grassToApply = "images/grond/grasboven.png";										
+										break;
+									case DOWN:
+										grassToApply = "images/grond/grasonder.png";
+										y = y + 23;
+										break;
+									case LEFT:
+										grassToApply = "images/grond/graslinks.png";
+										break;
+									case RIGHT:
+										grassToApply = "images/grond/grasrechts.png";
+										x = x + 23;
+										break;
+								}
+								BufferedImage grass = ImageIO.read(new File(grassToApply));
+								g.drawImage(grass, x, y, this);
+							} catch (IOException ex) {
+								System.out.println(ex);
+							}
+						}
+					}			
+				}
+				if (field.hasGameObject()) {
+					try {
+						BufferedImage img = ImageIO.read(new File(field.getGameObject().getImage()));
+						g.drawImage(img, field.getPosX(), field.getPosY(), this);
+					} catch (IOException ex) {
+
+					}
 				}
 			}
 		}

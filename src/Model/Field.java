@@ -69,6 +69,10 @@ public class Field {
 	public boolean hasGameObject() {
 		return gameObject != null;
 	}
+	
+	public boolean isWalkable() {
+		return gameObject == null || gameObject instanceof PowerUp;
+	}
 
 	public void setGameObject(GameObject gameObject) {
 		this.gameObject = gameObject;

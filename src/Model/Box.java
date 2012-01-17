@@ -13,7 +13,7 @@ import Components.Direction;
 public class Box extends GameObject implements MoveableObject {
 	
 	public Box(Field field) {
-		super(field, "");
+		super(field, "images/pion.png");
 	}
 	
 	public boolean move(Direction direction) {
@@ -28,7 +28,12 @@ public class Box extends GameObject implements MoveableObject {
 						setField(newField);
 						return true;
 					}
-				}				
+				} else if (newField.getGameObject() instanceof PowerUp) {
+					newField.setGameObject(getField().getGameObject());
+					getField().setGameObject(null);
+					setField(newField);
+					return true;
+				}	
 			} else  {
 				newField.setGameObject(getField().getGameObject());
 				getField().setGameObject(null);

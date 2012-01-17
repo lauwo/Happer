@@ -9,9 +9,14 @@ package Model;
  * @author Laurens
  */
 public class Rock extends GameObject {
-
-	public Rock(Field field) {
-		super(field, "images/rock.png");
+	
+	public Rock(Field field) {		
+		super(field, "images/huisjes/" + (int)((Math.random() * 13) + 1) + ".png");
 		field.setGameObject(this);
-	}	
+	}
+	
+	private String getImageString() {
+		
+		return "";
+	}
 }

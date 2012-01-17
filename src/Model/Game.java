@@ -6,12 +6,16 @@ package Model;
 
 import Components.Difficulty;
 import Components.GameState;
+import Components.HumanState;
 import View.Gameframe;
 import View.Options;
 import View.Playfield;
 import View.StartPanel;
 import View.StatusPanel;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 /**
  *
@@ -28,6 +32,7 @@ public class Game {
 	private Difficulty difficulty;
 	private Human human;
 	private Happer happer;
+	private Timer powerupTimer;
 	
 	public Game(Gameframe gameWindow) {
 		boxPercentage = 20;
@@ -52,6 +57,8 @@ public class Game {
 		this.playfield = null;
 		if (happer != null)
 			happer.getTimer().stop();
+		if (powerupTimer != null)
+			powerupTimer.stop();
 		happer = null;
 		human = null;
 		playfield = new Playfield(fieldDimension, this);
@@ -60,6 +67,7 @@ public class Game {
 		int happerSpeed = difficulty == Difficulty.HARD ? 250 : difficulty == Difficulty.MEDIUM ? 500 : 750;
 		happer = new Happer(playfield.getRandomEmptyField(), this, happerSpeed);
 		human = new Human(playfield.getRandomEmptyField(), this);
+		activatePowerUps();
 		resume();
 	}
 	
@@ -179,4 +187,28 @@ public class Game {
 		Dimension dimension = new Dimension(playfieldDimension * Field.width + 16, playfieldDimension * Field.height + 58);
 		gameWindow.setSize(dimension);
 	}
+	
+	public void slowDownHapper() {
+		happer.slowDown();
+	}
+	
+	public void activatePowerUps() {
+		powerupTimer = new Timer(10000, powerUpSpawner);
+		powerupTimer.start();
+	}
+	
+	public void spawnPowerUp() {
+		int random = (int)(Math.random() * 2) + 1;
+		PowerUp powerUp;
+		if (random == 1)
+			powerUp = new ImmunityShield(playfield.getRandomEmptyField());
+		else if (random == 2)
+			powerUp = new SlowDown(playfield.getRandomEmptyField(), this);
+	}
+	
+	ActionListener powerUpSpawner = new ActionListener() {
+		public void actionPerformed(ActionEvent evt) {
+			spawnPowerUp();
+		}
+	};
 }

@@ -40,7 +40,7 @@ public class Pathfinder {
 				while (it.hasNext()) {
 					Field neighbourField = (Field)it.next();
 					if (!checkedFields.contains(neighbourField)) {
-						if (!neighbourField.hasGameObject() || neighbourField.getGameObject() instanceof Human) {
+						if (neighbourField.isWalkable() || neighbourField.getGameObject() instanceof Human) {
 							ArrayList<Field> newRoute = new ArrayList<Field>(shortestRoute);
 							newRoute.add(neighbourField);
 							possibleRoutes.add(newRoute);
@@ -54,7 +54,7 @@ public class Pathfinder {
 				}
 				possibleRoutes.remove(shortestRoute);			
 			}
-		}		
+		}
 		
 		ArrayList<Field> emptyNeighbourFields = currentField.getEmptyNeighbourFields();
 		if (!emptyNeighbourFields.isEmpty()) {

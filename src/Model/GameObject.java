@@ -47,6 +47,10 @@ public abstract class GameObject {
 			g.setColor(Color.BLACK);
 		else if (field.getGameObject() instanceof Human)
 			g.setColor(Color.GREEN);
+		else if (field.getGameObject() instanceof ImmunityShield)
+			g.setColor(Color.YELLOW);
+		else if (field.getGameObject() instanceof SlowDown)
+			g.setColor(Color.DARK_GRAY);
 		
 		g.fillRect(getField().getPosX(), getField().getPosY(), getField().width, getField().height);
 	}

@@ -17,14 +17,18 @@ public class Happer extends GameObject implements MoveableObject {
 
 	private Game game;
 	private Timer timer;
+	private int initialSpeed;
+	private Timer slowDownTimer;
 	
 	public Happer(Field field, Game game, int speed) {
-		super(field, "");
+		super(field, "images/happer/autobeneden.png");
 		this.game = game;
+		this.initialSpeed = speed;
 		field.setGameObject(this);
-		timer = new Timer(speed, gameTimeActions);
+		timer = new Timer(speed, happerMovement);
 		timer.setInitialDelay(0);
 		timer.start();
+		slowDownTimer = new Timer(5000, slowDownHapper);
 	}
 	
 	public void moveToHuman() {
@@ -32,32 +36,50 @@ public class Happer extends GameObject implements MoveableObject {
 	}
 	
 	public boolean move(Direction direction) {
+		if (direction != null) {		
+			switch (direction) {
+				case LEFT:
+					super.setImage("images/happer/autolinks.png");
+				break;
+				case RIGHT:
+					super.setImage("images/happer/autorechts.png");
+				break;
+				case DOWN:
+					super.setImage("images/happer/autobeneden.png");
+				break;
+				case UP:
+					super.setImage("images/happer/autoboven.png");
+				break;
+			}
+		}
 		if (getField().getEmptyNeighbourFields().isEmpty()) {
-			game.win();
 			timer.stop();
+			game.win();
 		}
 		Field newField = getField().getNeighbourField(direction);				
 		if (newField != null) {
-			if (!newField.hasGameObject()) {
+			if (newField.isWalkable()) {
 				newField.setGameObject(getField().getGameObject());
 				getField().setGameObject(null);
 				setField(newField);
 				game.getPlayfield().updateUI();
 				return true;
 			} else if (newField.getGameObject() instanceof Human) {
-				catchHuman();
-				timer.stop();
+				Human human = (Human)newField.getGameObject();
+				if (!human.isImmune())
+					catchHuman();
 			}
 		}
 		return false;
 	}
 	
 	public void catchHuman() {
+		timer.stop();
 		game.lose();
 	}
 	
 		
-	ActionListener gameTimeActions = new ActionListener() {
+	ActionListener happerMovement = new ActionListener() {
 		public void actionPerformed(ActionEvent evt) {
 			moveToHuman();
 		}
@@ -70,4 +92,16 @@ public class Happer extends GameObject implements MoveableObject {
 	public void setTimer(Timer timer) {
 		this.timer = timer;
 	}
+	
+	public void slowDown() {
+		timer.setDelay(timer.getDelay() + 250);
+		slowDownTimer.restart();
+	}
+	
+	ActionListener slowDownHapper = new ActionListener() {
+		public void actionPerformed(ActionEvent evt) {
+			timer.setDelay(initialSpeed);
+			((Timer)evt.getSource()).stop();
+		}
+	};
 }
