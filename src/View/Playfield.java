@@ -11,7 +11,6 @@
 package View;
 
 import Components.Direction;
-import Components.Logger;
 import Model.Box;
 import Model.Field;
 import Model.Game;
@@ -48,8 +47,7 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		rows = new ArrayList<ArrayList<Field>>();
         setBorder(BorderFactory.createLineBorder(Color.yellow, 1));
 		this.setFocusable(true);
-		addKeyListener(this);		
-		Logger.log("Playfield loaded.");
+		addKeyListener(this);
 		initiatePlayfield();
 	}
 
@@ -79,7 +77,7 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	}
 	/**
 	 * Gets a random field that does not have a game object on it somewhere on the playfield 
-	 * @return Field if a random empty field could be found
+	 * @return field if a random empty field could be located.
 	 */
 	
 	public Field getRandomEmptyField()	{
@@ -154,64 +152,59 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	}
 	
     protected void paintBackground(Graphics g) {
-		for (ArrayList<Field> row : rows) {
-			for (Field field : row) {
-					try {
-						BufferedImage road = ImageIO.read(new File("images/grond/asfalt.png"));
-						g.drawImage(road, field.getPosX(), field.getPosY(), this);
-					} catch (IOException ex) {
-						System.out.println(ex);
-					}
-				if (field.hasGameObject()) {
-					try {
-						if (field.getGameObject() instanceof Rock) {
-							BufferedImage grass = ImageIO.read(new File("images/grond/gras.png"));
+		try {
+			BufferedImage road = ImageIO.read(new File("images/grond/asfalt.png"));
+			BufferedImage grass = ImageIO.read(new File("images/grond/gras.png"));
+			BufferedImage grassTop = ImageIO.read(new File("images/grond/grasboven.png"));
+			BufferedImage grassUnder = ImageIO.read(new File("images/grond/grasonder.png"));
+			BufferedImage grassRight = ImageIO.read(new File("images/grond/grasrechts.png"));
+			BufferedImage grassLeft = ImageIO.read(new File("images/grond/graslinks.png"));
+			for (ArrayList<Field> row : rows) {
+				for (Field field : row) {
+					g.drawImage(road, field.getPosX(), field.getPosY(), this);
+					if (field.hasGameObject()) {
+						if (field.getGameObject() instanceof Rock) {								
 							g.drawImage(grass, field.getPosX(), field.getPosY(), this);
-						}				
-					} catch (IOException ex) {
-						System.out.println(ex);
-					}					
-				}
-				for (Field neighbour : field.getNeighbourFields().values()) {
-					if (neighbour.hasGameObject()) {
-						if (neighbour.getGameObject() instanceof Rock) {
-							try {
-								String grassToApply = "";
+						}								
+					}
+					for (Field neighbour : field.getNeighbourFields().values()) {
+						if (neighbour.hasGameObject()) {
+							if (neighbour.getGameObject() instanceof Rock) {
+								Image grassToApply = null;
 								int x = field.getPosX();
 								int y = field.getPosY();
 								switch (field.getNeighbourDirection(neighbour)) {
 									case UP:
-										grassToApply = "images/grond/grasboven.png";										
+										grassToApply = grassTop;										
 										break;
 									case DOWN:
-										grassToApply = "images/grond/grasonder.png";
+										grassToApply = grassUnder;
 										y = y + 23;
 										break;
 									case LEFT:
-										grassToApply = "images/grond/graslinks.png";
+										grassToApply = grassLeft;
 										break;
 									case RIGHT:
-										grassToApply = "images/grond/grasrechts.png";
+										grassToApply = grassRight;
 										x = x + 23;
 										break;
 								}
-								BufferedImage grass = ImageIO.read(new File(grassToApply));
-								g.drawImage(grass, x, y, this);
-							} catch (IOException ex) {
-								System.out.println(ex);
+								g.drawImage(grassToApply, x, y, this);
 							}
-						}
-					}			
-				}
-				if (field.hasGameObject()) {
-					try {
-						BufferedImage img = ImageIO.read(new File(field.getGameObject().getImage()));
-						g.drawImage(img, field.getPosX(), field.getPosY(), this);
-					} catch (IOException ex) {
+						}			
+					}
+					if (field.hasGameObject()) {
+						try {
+							BufferedImage img = ImageIO.read(new File(field.getGameObject().getImage()));
+							g.drawImage(img, field.getPosX(), field.getPosY(), this);
+						} catch (IOException ex) {
 
+						}
 					}
 				}
 			}
+		} catch (IOException ex) {
+			System.out.println(ex);
 		}
     }
 

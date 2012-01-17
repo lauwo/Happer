@@ -11,7 +11,6 @@
 package View;
 
 import Components.GameState;
-import Components.Logger;
 import Model.Game;
 import java.awt.BorderLayout;
 
@@ -26,7 +25,6 @@ public class Gameframe extends javax.swing.JFrame {
 	public Gameframe() {
 		initComponents();
 		jPlayfieldPanel.setLayout(new BorderLayout());
-		Logger.log("Gameframe loaded.");
         game = new Game(this);
 	}
 
