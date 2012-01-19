@@ -9,5 +9,17 @@ package Components;
  * @author Laurens
  */
 public enum Difficulty {
-	EASY, MEDIUM, HARD
+
+	/**
+	 * 
+	 */
+	EASY,
+	/**
+	 * 
+	 */
+	MEDIUM,
+	/**
+	 * 
+	 */
+	HARD
 }

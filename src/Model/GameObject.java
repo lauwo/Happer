@@ -4,13 +4,6 @@
  */
 package Model;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-
 /**
  *
  * @author Laurens
@@ -20,53 +13,44 @@ public abstract class GameObject {
 	private String image;
 	private Field field;
 	
+	/**
+	 * creates a new GameObject
+	 * @param field the field that the GameObject should be placed upon
+	 * @param imageUrl the url to the image that the GameObject should have
+	 */
 	public GameObject(Field field, String imageUrl) {
 		this.field = field;
 		this.image = imageUrl;
 	}
-	
-	public void Draw(Graphics g){		
-//		try {
-//			Image img = ImageIO.read(new File(this.image));
-//			int width = Field.width;
-//			int height = Field.height;
-//			int frame = 1;
-//			int frameX = (frame % 3) * width;
-//			int frameY = (frame / 3) * width;
-//			//g.drawImage(img, field.getPosX(), field.getPosY(), field.getPosX()+width, field.getPosY()+height, frameX, frameY, frameX+width, frameY+height, field.getPlayField());
-//			g.drawImage(img, 16, 16, field.getPlayField());
-//		} catch (IOException ex) {
-//			System.out.println(ex);
-//		}
-		
-		if (field.getGameObject() instanceof Box)
-			g.setColor(Color.BLUE);
-		else if (field.getGameObject() instanceof Happer)
-			g.setColor(Color.RED);
-		else if (field.getGameObject() instanceof Rock)
-			g.setColor(Color.BLACK);
-		else if (field.getGameObject() instanceof Human)
-			g.setColor(Color.GREEN);
-		else if (field.getGameObject() instanceof ImmunityShield)
-			g.setColor(Color.YELLOW);
-		else if (field.getGameObject() instanceof SlowDown)
-			g.setColor(Color.DARK_GRAY);
-		
-		g.fillRect(getField().getPosX(), getField().getPosY(), getField().width, getField().height);
-	}
 
+	/**
+	 * retrieves the field that the gameobject is located on
+	 * @return the field that the gameobject is currently located on
+	 */
 	public Field getField() {
 		return field;
 	}
 
+	/**
+	 * sets the field that the gameobject is located on
+	 * @param field the field that the gameobject should be placed upon
+	 */
 	public void setField(Field field) {
 		this.field = field;
 	}
 
+	/**
+	 * retrieves the imageurl for the gameobject
+	 * @return the current imageurl for the gameobject
+	 */
 	public String getImage() {
 		return image;
 	}
 
+	/**
+	 * sets the imageurl for the gameobject
+	 * @param image the new imageurl for the gameobject
+	 */
 	public void setImage(String image) {
 		this.image = image;
 	}

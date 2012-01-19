@@ -12,10 +12,19 @@ import Components.Direction;
  */
 public class Box extends GameObject implements MoveableObject {
 	
+	/**
+	 * creates for a box
+	 * @param field the field that the box should be located on
+	 */
 	public Box(Field field) {
 		super(field, "images/pion.png");
 	}
 	
+	/**
+	 * moves the box in a given direction
+	 * @param direction the direction for the box to move in
+	 * @return true if the box moved
+	 */
 	public boolean move(Direction direction) {
 		Field newField = getField().getNeighbourField(direction);				
 		if (newField != null) {

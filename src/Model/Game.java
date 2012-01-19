@@ -6,7 +6,6 @@ package Model;
 
 import Components.Difficulty;
 import Components.GameState;
-import Components.HumanState;
 import View.Gameframe;
 import View.Options;
 import View.Playfield;
@@ -34,8 +33,12 @@ public class Game {
 	private Happer happer;
 	private Timer powerupTimer;
 	
+	/**
+	 * create a new game
+	 * @param gameWindow the GameWindow the game should utilize to show itself
+	 */
 	public Game(Gameframe gameWindow) {
-		boxPercentage = 20;
+		boxPercentage = 15;
 		rockPercentage = 10;
 		difficulty = Difficulty.EASY;
 		playfieldDimension = 20;
@@ -44,16 +47,24 @@ public class Game {
 		initGameWindow();
 	}
 	
+	
+	/**
+	 * initializes the game window
+	 */
 	private void initGameWindow() {
-		StartPanel startPanel = new StartPanel(this);
-		gameWindow.jPlayfieldPanel.add(startPanel);
 		gameWindow.setResizable(false);
-		gameWindow.setPreferredSize(startPanel.getPreferredSize());
-		gameWindow.pack();
+		showStartPanel();
 	}
 	
+	/**
+	 * initializes the playfield
+	 * @param fieldDimension the dimension the playfield
+	 * @param boxPercentage the percentage of boxes on the field
+	 * @param rockPercentage the percentage of rocks on the field
+	 * @param difficulty the difficulty of the game
+	 */
 	private void initPlayfield(int fieldDimension, int boxPercentage, int rockPercentage, Difficulty difficulty) {
-		Dimension dimension = new Dimension(fieldDimension * Field.width + 16, fieldDimension * Field.height + 58);
+		Dimension dimension = new Dimension(fieldDimension * Field.width + 6, fieldDimension * Field.height + 51);
 		this.playfield = null;
 		if (happer != null)
 			happer.getTimer().stop();
@@ -61,20 +72,36 @@ public class Game {
 			powerupTimer.stop();
 		happer = null;
 		human = null;
-		playfield = new Playfield(fieldDimension, this);
+		setPlayfield(new Playfield(fieldDimension, true));
 		gameWindow.setSize(dimension);
 		playfield.addGameObjects(boxPercentage, rockPercentage);
+		playfield.addHuman(this);
 		int happerSpeed = difficulty == Difficulty.HARD ? 250 : difficulty == Difficulty.MEDIUM ? 500 : 750;
 		happer = new Happer(playfield.getRandomEmptyField(), this, happerSpeed);
-		human = new Human(playfield.getRandomEmptyField(), this);
+		human = playfield.getHuman();
 		activatePowerUps();
 		resume();
 	}
 	
+	/**
+	 * retrieve the current playfield
+	 * @return the current playfield
+	 */
 	public Playfield getPlayfield() {
 		return playfield;
 	}
 	
+	/**
+	 * sets the playfield to be used in the game
+	 * @param playfield the new playfield to be used 
+	 */
+	public void setPlayfield(Playfield playfield) {
+		this.playfield = playfield;
+	}
+	
+	/**
+	 * pauses the game
+	 */
 	public void pause() {
 		gameState = gameState.PAUSED;
 		playfield.setEnabled(false);
@@ -82,22 +109,34 @@ public class Game {
 		showStatusPanel();
 	}
 	
+	/**
+	 * starts the game
+	 */
 	public void start() {
-		gameState = gameState.STARTED;
+		gameState = gameState.RUNNING;
 		gameWindow.jPlayfieldPanel.removeAll();
 		initPlayfield(playfieldDimension, boxPercentage, rockPercentage, difficulty);
 		gameWindow.jPlayfieldPanel.add(playfield);
 		playfield.setRequestFocusEnabled(true);
-	}
-	
-	public void resume() {
-		gameState = gameState.STARTED;
-		restorePlayfield();
-		playfield.setEnabled(true);
-		happer.getTimer().start();
 		playfield.requestFocus();
 	}
 	
+	/**
+	 * resumes the game
+	 */
+	public void resume() {
+		if (gameState == GameState.PAUSED) {
+			restorePlayfield();
+			playfield.setEnabled(true);
+			gameState = gameState.RUNNING;
+			happer.getTimer().start();
+			playfield.requestFocus();
+		}
+	}
+	
+	/**
+	 * resets the game
+	 */
 	public void reset() {
 		gameWindow.jPlayfieldPanel.removeAll();
 		initPlayfield(playfieldDimension, boxPercentage, rockPercentage, difficulty);
@@ -105,18 +144,29 @@ public class Game {
 		playfield.requestFocus();
 	}
 	
+	/**
+	 * stops the game
+	 */
 	public void stop() {
-		pause();
+		if (gameState == GameState.RUNNING)
+			pause();
 		gameState = gameState.STOPPED;
 		showStatusPanel();
 	}
 
+	/**
+	 * retrieve the current state of the game
+	 * @return the current state of the game
+	 */
 	public GameState getState() {
 		return gameState;
 	}
 	
+	/**
+	 * hide the playfield and show the option panel
+	 */
 	public void showOptionsPanel() {
-		if (getState() == GameState.STARTED)
+		if (getState() == GameState.RUNNING)
 			pause();
 			
 		Options optionsPanel = new Options(this);
@@ -125,90 +175,160 @@ public class Game {
 		gameWindow.setSize(optionsPanel.getPreferredSize());
 	}
 
+	/**
+	 * retrieve the current boxpercentage setting
+	 * @return the percentage of boxes on the playfield
+	 */
 	public int getBoxPercentage() {
 		return boxPercentage;
 	}
 
+	/**
+	 * set the box percentage
+	 * @param boxPercentage the new percentage of boxes on the playfield
+	 */
 	public void setBoxPercentage(int boxPercentage) {
 		this.boxPercentage = boxPercentage;
 	}
 
+	/**
+	 * retrieve the current difficulty of the game
+	 * @return the current difficulty of the game
+	 */
 	public Difficulty getDifficulty() {
 		return difficulty;
 	}
 
+	/**
+	 * set the difficulty for the game
+	 * @param difficulty the new level of difficulty
+	 */
 	public void setDifficulty(Difficulty difficulty) {
 		this.difficulty = difficulty;
 	}
 
+	/**
+	 * retrieve the current rockpercentage setting
+	 * @return the percentage of rocks on the playfield
+	 */
 	public int getRockPercentage() {
 		return rockPercentage;
 	}
 
+	/**
+	 * sets the percentage of rocks on the playfield
+	 * @param rockPercentage the new percentage of rocks on the playfield
+	 */
 	public void setRockPercentage(int rockPercentage) {
 		this.rockPercentage = rockPercentage;
 	}
 
+	/**
+	 * retrieve the current playfield dimension
+	 * @return the current playfieldDimension
+	 */
 	public int getPlayfieldDimension() {
 		return playfieldDimension;
 	}
 
+	/**
+	 * set the playfield dimension
+	 * @param fieldDimension the new playfield dimension
+	 */
 	public void setPlayfieldDimension(int fieldDimension) {
 		this.playfieldDimension = fieldDimension;
 	}
 	
+	/**
+	 * called when the player wins the game, stops the game and shows new panel
+	 */
 	public void win() {
 		stop();
 		this.gameState = GameState.WON;
 		showStatusPanel();
 	}
 	
+	/**
+	 * called when the player loses the game, stops the game and shows new panel
+	 */
 	public void lose() {
 		stop();
 		this.gameState = GameState.LOST;
 		showStatusPanel();
 	}
 	
+	/**
+	 * retrieve the human
+	 * @return the human
+	 */
 	public Human getHuman() {
 		return human;
 	}
 	
+	/**
+	 * shows a new panel that will check the state of the game and show information accordingly
+	 */
 	private void showStatusPanel() {
 		gameWindow.jPlayfieldPanel.removeAll();
 		gameWindow.jPlayfieldPanel.add(new StatusPanel(this));
 		Dimension statusDimension = new Dimension(400, 400);
 		gameWindow.setSize(statusDimension);
+		gameWindow.setPreferredSize(statusDimension);
+		gameWindow.pack();
 	}
 	
+	/**
+	 * shows the games start panel
+	 */
+	public void showStartPanel() {
+		gameWindow.jPlayfieldPanel.removeAll();
+		StartPanel startPanel = new StartPanel(this);
+		gameWindow.jPlayfieldPanel.add(startPanel);
+		gameWindow.setPreferredSize(startPanel.getPreferredSize());
+		gameWindow.pack();
+	}
+	
+	/**
+	 * restores the playfield panel if a different panel was being shown (for example when the game was paused)
+	 */
 	public void restorePlayfield() {
 		gameWindow.jPlayfieldPanel.removeAll();
 		gameWindow.jPlayfieldPanel.add(playfield);
 		playfield.setVisible(true);
-		Dimension dimension = new Dimension(playfieldDimension * Field.width + 16, playfieldDimension * Field.height + 58);
+		Dimension dimension = new Dimension(playfieldDimension * Field.width + 8, playfieldDimension * Field.height + 50);
 		gameWindow.setSize(dimension);
 	}
 	
+	/**
+	 * slows down the happer (used for powerup)
+	 */
 	public void slowDownHapper() {
 		happer.slowDown();
 	}
 	
+	/**
+	 * activates powerups for the current game
+	 */
 	public void activatePowerUps() {
+		ActionListener powerUpSpawner = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				spawnPowerUp();
+			}
+		};
 		powerupTimer = new Timer(10000, powerUpSpawner);
 		powerupTimer.start();
 	}
 	
+	/**
+	 * spawns a random powerup on the playfield
+	 */
 	public void spawnPowerUp() {
 		int random = (int)(Math.random() * 2) + 1;
 		PowerUp powerUp;
 		if (random == 1)
 			powerUp = new ImmunityShield(playfield.getRandomEmptyField());
 		else if (random == 2)
-			powerUp = new SlowDown(playfield.getRandomEmptyField(), this);
+			powerUp = new SlowDown(playfield.getRandomEmptyField());
 	}
-	
-	ActionListener powerUpSpawner = new ActionListener() {
-		public void actionPerformed(ActionEvent evt) {
-			spawnPowerUp();
-		}
-	};
 }

@@ -16,24 +16,20 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="99" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="lblF5" alignment="0" max="32767" attributes="1"/>
-                          <Component id="lblF3" alignment="0" pref="184" max="32767" attributes="1"/>
-                          <Component id="lblF4" alignment="0" min="-2" pref="151" max="-2" attributes="0"/>
-                          <Component id="lblF10" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblF11" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="123" max="-2" attributes="0"/>
-                      <Component id="lblText" min="-2" pref="258" max="-2" attributes="0"/>
-                  </Group>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace pref="132" max="32767" attributes="0"/>
+              <Component id="lblText" min="-2" pref="258" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="102" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                  <Component id="lblF5" alignment="0" max="32767" attributes="1"/>
+                  <Component id="lblF3" alignment="0" pref="184" max="32767" attributes="1"/>
+                  <Component id="lblF4" alignment="0" min="-2" pref="151" max="-2" attributes="0"/>
+                  <Component id="lblF10" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="19" max="32767" attributes="0"/>
+              <EmptySpace pref="114" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -50,9 +46,7 @@
               <Component id="lblF4" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lblF10" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblF11" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="51" max="32767" attributes="0"/>
+              <EmptySpace pref="71" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -84,11 +78,6 @@
     <Component class="javax.swing.JLabel" name="lblF10">
       <Properties>
         <Property name="text" type="java.lang.String" value="Press &quot;F10&quot; to go to the option menu"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblF11">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Press &quot;F11&quot; to view the highscores"/>
       </Properties>
     </Component>
   </SubComponents>

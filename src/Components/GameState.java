@@ -9,5 +9,24 @@ package Components;
  * @author Laurens
  */
 public enum GameState {
-	STARTED, STOPPED, PAUSED, WON, LOST
+	/**
+	 * 
+	 */
+	RUNNING,
+	/**
+	 * 
+	 */
+	STOPPED,
+	/**
+	 * 
+	 */
+	PAUSED,
+	/**
+	 * 
+	 */
+	WON,
+	/**
+	 * 
+	 */
+	LOST
 }

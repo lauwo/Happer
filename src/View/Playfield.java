@@ -14,6 +14,8 @@ import Components.Direction;
 import Model.Box;
 import Model.Field;
 import Model.Game;
+import Model.GameObject;
+import Model.Human;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
@@ -35,34 +37,47 @@ import javax.imageio.ImageIO;
 public class Playfield extends javax.swing.JPanel implements KeyListener {
 
 	private int playfieldDimension;
-    public ArrayList<ArrayList<Field>> rows;
-	private Game game;
-	boolean currentlyMoving = false;
-	BufferedImage road;
-	BufferedImage grass;
-	BufferedImage grassTop;
-	BufferedImage grassUnder;
-	BufferedImage grassRight;
-	BufferedImage grassLeft;
+	public ArrayList<ArrayList<Field>> rows;
+	private Human human;
+	private boolean currentlyMoving;
+	private boolean walls;
+	private BufferedImage road;
+	private BufferedImage grass;
+	private BufferedImage grassTop;
+	private BufferedImage grassUnder;
+	private BufferedImage grassRight;
+	private BufferedImage grassLeft;
 
-	public Playfield(int dimension, Game game) {
-		this.game = game;
+	/**
+	 * create a new playfield
+	 * @param dimension the dimension of the playfield
+	 * @param walls true if there should be walls, false if the field shouldnt have walls
+	 */
+	public Playfield(int dimension, boolean walls) {
 		initComponents();
 		playfieldDimension = dimension;
+		this.walls = walls;
+		this.currentlyMoving = false;
 		setLayout(null);
 		rows = new ArrayList<ArrayList<Field>>();
         setBorder(BorderFactory.createLineBorder(Color.yellow, 1));
 		this.setFocusable(true);
 		addKeyListener(this);
 		initiatePlayfield();
-		loadImages();
+		loadImages();		
 	}
 
+	/*
+	 * initializes the playfield
+	 */
 	private void initiatePlayfield() {
 		initFields();
 		setNeighbourFields();
 	}
 	
+	/*
+	 * load the images needed for display (so this is only done once for performance reasons)
+	 */
 	private void loadImages() {
 		try {
 			 road = ImageIO.read(new File("images/grond/asfalt.png"));
@@ -76,6 +91,11 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		}
 	}
 	
+	/**
+	 * add the game objects to the playfield (boxes & rocks)
+	 * @param boxPercentage the percentage of boxes on the playfield
+	 * @param rockPercentage the percentage of rocks on the playfield
+	 */
 	public void addGameObjects(int boxPercentage, int rockPercentage) {
 		int boxesPerRow = (int)Math.round(((double)playfieldDimension / 100) * boxPercentage);		
 		int rocksPerRow = (int)Math.round(((double)playfieldDimension / 100) * rockPercentage);
@@ -95,9 +115,26 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		}		
 		
 	}
+	
 	/**
-	 * Gets a random field that does not have a game object on it somewhere on the playfield 
-	 * @return field if a random empty field could be located.
+	 * adds the human to the game (this can only be done once, else you will simply replace the old one)
+	 * @param game the game the human is being added to
+	 */
+	public void addHuman(Game game) {
+		human = new Human(getRandomEmptyField(), game);
+	}
+	
+	/**
+	 * retrieve the human
+	 * @return the human
+	 */
+	public Human getHuman() {
+		return human;
+	}
+	
+	/**
+	 * Gets a random field that does not have a game object on it anywhere on the playfield 
+	 * @return a random empty field on the playfield
 	 */
 	
 	public Field getRandomEmptyField()	{
@@ -114,6 +151,9 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	}
 	
 	
+	/**
+	 * creates the fields and add them to an arraylist
+	 */
 	public void initFields() {
 		for (int i = 0; i < playfieldDimension; i++){
 			ArrayList<Field> row = new ArrayList<Field>();
@@ -126,7 +166,9 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 			rows.add(row);
 		}
 	}
-	
+	/**
+	 * sets the neighbourfields that every field has
+	 */
 	public void setNeighbourFields() {
 		for (ArrayList<Field> row : rows) {
 			for (Field field : row) {				
@@ -136,6 +178,20 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 				Field down = getField(currentRow + 1, currentField);
 				Field left = getField(currentRow, currentField - 1);
 				Field right = getField(currentRow, currentField + 1);
+				
+				if (!walls) {
+					if (up == null)
+						up = getField(rows.size() - 1, currentField);
+					
+					if (down == null)
+						down = getField(0, currentField);
+					
+					if (left == null)
+						left = getField(currentRow, row.size() - 1);
+					
+					if (right == null)
+						right = getField(currentRow, 0);
+				}
 				
 				if (up != null)
 					field.setNeighbourField(Direction.UP, up);
@@ -152,7 +208,11 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		}
 	}
 	
-	private Field getField(int x, int y) {
+	/*
+	 * gets a field at a current position within the arraylist
+	 * @return the requested field if it is within the playfield's boundaries
+	 */
+	public Field getField(int x, int y) {
 		if (x < rows.size() && x >= 0) {
 			if (y < rows.get(x).size() && y >= 0) {
 				return rows.get(x).get(y);
@@ -160,18 +220,15 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		}
  		return null;
 	}
-
-	public Game getGame() {
-		return game;
-	}	
 	
+
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		paintBackground(g);
 	}
-	
-    protected void paintBackground(Graphics g) {
+
+	protected void paintBackground(Graphics g) {
 		for (ArrayList<Field> row : rows) {
 			for (Field field : row) {
 				g.drawImage(road, field.getPosX(), field.getPosY(), this);
@@ -218,7 +275,8 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		}
     }
 
-    @Override
+
+	@Override
     public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
         super.imageUpdate(img, flags, x, y, w, h);
         repaint();
@@ -245,27 +303,35 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 
+	/**
+	 * this method is called whenever the actor first presses and then releases a key
+	 * @param e
+	 */
 	@Override
 	public void keyTyped(KeyEvent e) {
 	
 	}
 	
+	/**
+	 * this method gets called whenever the actor presses a key
+	 * @param e
+	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (!currentlyMoving) {
 			currentlyMoving = true;
 			 switch(e.getKeyCode())	{
 				case KeyEvent.VK_DOWN:
-					 game.getHuman().move(Direction.DOWN);
+					human.move(Direction.DOWN);
 					break;
 				case KeyEvent.VK_UP:
-					game.getHuman().move(Direction.UP);
+					human.move(Direction.UP);
 					break;
 				case KeyEvent.VK_RIGHT:
-					 game.getHuman().move(Direction.RIGHT);
+					 human.move(Direction.RIGHT);
 					break;
 				case KeyEvent.VK_LEFT:
-					 game.getHuman().move(Direction.LEFT);
+					 human.move(Direction.LEFT);
 					break;
 				default:
 					
@@ -274,6 +340,10 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		}
 	}
 
+	/**
+	 * this method is called whenever the actor releases a key
+	 * @param e
+	 */
 	@Override
 	public void keyReleased(KeyEvent e) {
 		currentlyMoving = false;

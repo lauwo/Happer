@@ -10,15 +10,12 @@ package Model;
  */
 public class SlowDown extends GameObject implements PowerUp {
 	
-	private Game game;
-	
-	public SlowDown(Field field, Game game) {
+	/**
+	 * creates a new slowdown powerup
+	 * @param field the field the slowdown should be located upon
+	 */
+	public SlowDown(Field field) {
 		super(field, "images/lekkeband.png");
 		field.setGameObject(this);
-		this.game = game;
-	}
-	
-	public void onPickUp() {
-		
 	}
 }

@@ -11,6 +11,7 @@
 package View;
 
 import Components.Difficulty;
+import Components.GameState;
 import Model.Game;
 import javax.swing.ButtonGroup;
 
@@ -22,7 +23,9 @@ public class Options extends javax.swing.JPanel {
 
 	private Game game;
 	
-	/** Creates new form Options */
+	/** Creates new form Options
+	 * @param game 
+	 */
 	public Options(Game game) {
 		this.game = game;
 		initComponents();
@@ -30,6 +33,9 @@ public class Options extends javax.swing.JPanel {
 		initScreen();
 	}
 	
+	/**
+	 * sets the buttonGroups for the option panel
+	 */
 	private void setButtonGroups() {
 		ButtonGroup boxPercentage = new ButtonGroup();
 		boxPercentage.add(btnBox15);
@@ -47,6 +53,9 @@ public class Options extends javax.swing.JPanel {
 		difficulty.add(btnHard);
 	}
 	
+	/**
+	 * loads in the current settings into the option panel
+	 */
 	private void initScreen() {
 		lblDimension.setText(Integer.toString(game.getPlayfieldDimension()));
 		sliderDimension.setValue(game.getPlayfieldDimension());
@@ -236,7 +245,10 @@ public class Options extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 	private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-		game.resume();
+		if (game.getState() == GameState.PAUSED)
+			game.resume();
+		else
+			game.showStartPanel();
 	}//GEN-LAST:event_btnCancelActionPerformed
 
 	private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed

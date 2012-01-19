@@ -17,6 +17,11 @@ public class Pathfinder {
 	
 	private Pathfinder(){};
 	
+	/**
+	 * finds the shortest path towards the human and returns the direction the happer should move in first
+	 * @param currentField the happer's currentField
+	 * @return the direction for the happer to move in to get to the human in the fastest possible way
+	 */
 	public static Direction findShortestPath(Field currentField) {		
 		ArrayList<ArrayList<Field>> possibleRoutes = new ArrayList<ArrayList<Field>>();
 		HashSet<Field> checkedFields = new HashSet<Field>();

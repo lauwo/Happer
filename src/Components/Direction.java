@@ -9,6 +9,21 @@ package Components;
  * @author Laurens
  */
 public enum Direction {
-	UP, RIGHT, DOWN, LEFT
+	/**
+	 * 
+	 */
+	UP,
+	/**
+	 * 
+	 */
+	RIGHT,
+	/**
+	 * 
+	 */
+	DOWN,
+	/**
+	 * 
+	 */
+	LEFT
 }
 

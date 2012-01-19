@@ -20,7 +20,9 @@ public class StartPanel extends javax.swing.JPanel {
 
 	private Game game;
 	
-	/** Creates new form StartPanel */
+	/** Creates new form StartPanel
+	 * @param game 
+	 */
 	public StartPanel(Game game) {
 		initComponents();
 		this.game = game;
@@ -39,14 +41,13 @@ public class StartPanel extends javax.swing.JPanel {
         btnStart = new javax.swing.JButton();
         btnOptions = new javax.swing.JButton();
         btnQuit = new javax.swing.JButton();
-        btnHighscores = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(200, 300));
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24));
         jLabel1.setText("Welcome!");
 
-        btnStart.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        btnStart.setFont(new java.awt.Font("Tahoma", 0, 14));
         btnStart.setText("Start game (F2)");
         btnStart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -54,14 +55,21 @@ public class StartPanel extends javax.swing.JPanel {
             }
         });
 
-        btnOptions.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        btnOptions.setFont(new java.awt.Font("Tahoma", 0, 14));
         btnOptions.setText("Options (F10)");
+        btnOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOptionsActionPerformed(evt);
+            }
+        });
 
-        btnQuit.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        btnQuit.setFont(new java.awt.Font("Tahoma", 0, 14));
         btnQuit.setText("Quit");
-
-        btnHighscores.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        btnHighscores.setText("Highscores (F11)");
+        btnQuit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnQuitActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -73,12 +81,11 @@ public class StartPanel extends javax.swing.JPanel {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(btnQuit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnHighscores, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnOptions, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnStart, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(117, 117, 117))
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -89,11 +96,9 @@ public class StartPanel extends javax.swing.JPanel {
                 .addComponent(btnStart)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnOptions)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnHighscores)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(37, 37, 37)
                 .addComponent(btnQuit)
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap(85, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -101,8 +106,15 @@ public class StartPanel extends javax.swing.JPanel {
 		game.start();
 	}//GEN-LAST:event_btnStartActionPerformed
 
+	private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
+		System.exit(0);
+	}//GEN-LAST:event_btnQuitActionPerformed
+
+	private void btnOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOptionsActionPerformed
+		game.showOptionsPanel();
+	}//GEN-LAST:event_btnOptionsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnHighscores;
     private javax.swing.JButton btnOptions;
     private javax.swing.JButton btnQuit;
     private javax.swing.JButton btnStart;

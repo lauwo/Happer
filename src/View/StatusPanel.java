@@ -20,21 +20,26 @@ import Model.Game;
 public class StatusPanel extends javax.swing.JPanel {
 
 	private Game game;
-	/** Creates new form End */
+	/** Creates new form End
+	 * @param game 
+	 */
 	public StatusPanel(Game game) {
 		initComponents();
 		this.game = game;
 		initText();
 	}
 	
+	/**
+	 * Sets the correct display text based on the game state
+	 */
 	private void initText() {
 		switch (game.getState()) {
 			case LOST:
-				lblText.setText("FAILURE!");
+				lblText.setText("You lose!");
 				lblF3.setVisible(false);
 				break;
 			case WON:
-				lblText.setText("VICTORY!");
+				lblText.setText("You win!");
 				lblF3.setVisible(false);
 				break;
 			case PAUSED:
@@ -61,9 +66,8 @@ public class StatusPanel extends javax.swing.JPanel {
         lblF5 = new javax.swing.JLabel();
         lblF4 = new javax.swing.JLabel();
         lblF10 = new javax.swing.JLabel();
-        lblF11 = new javax.swing.JLabel();
 
-        lblText.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        lblText.setFont(new java.awt.Font("Tahoma", 1, 24));
         lblText.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         lblF3.setText("Press \"F3\" to resume playing");
@@ -74,26 +78,22 @@ public class StatusPanel extends javax.swing.JPanel {
 
         lblF10.setText("Press \"F10\" to go to the option menu");
 
-        lblF11.setText("Press \"F11\" to view the highscores");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(132, Short.MAX_VALUE)
+                .addComponent(lblText, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(99, 99, 99)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lblF5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblF3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
-                            .addComponent(lblF4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblF10, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblF11, javax.swing.GroupLayout.Alignment.LEADING)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(123, 123, 123)
-                        .addComponent(lblText, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addGap(102, 102, 102)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(lblF5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblF3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
+                    .addComponent(lblF4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblF10, javax.swing.GroupLayout.Alignment.LEADING))
+                .addContainerGap(114, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -108,14 +108,11 @@ public class StatusPanel extends javax.swing.JPanel {
                 .addComponent(lblF4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblF10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblF11)
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lblF10;
-    private javax.swing.JLabel lblF11;
     private javax.swing.JLabel lblF3;
     private javax.swing.JLabel lblF4;
     private javax.swing.JLabel lblF5;

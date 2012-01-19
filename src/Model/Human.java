@@ -20,15 +20,25 @@ public class Human extends GameObject implements MoveableObject {
 	private Timer immunityTimer;
 	private Direction currentDirection;
 	
+	/**
+	 * creates a new human
+	 * @param field the field that the human should be located upon
+	 * @param game the game that the human is involved in
+	 */
 	public Human(Field field, Game game) {
 		super(field, "images/mens/onder.png");
 		this.game = game;
 		field.setGameObject(this);
 		this.status = HumanState.NORMAL;
-		immunityTimer = new Timer(5000, removeImmunity);
+		setImmunityTimer();
 		currentDirection = Direction.DOWN;
 	}
 	
+	/**
+	 * moves the human in a given direction
+	 * @param direction the direction for the human to move in
+	 * @return true if the human moved
+	 */
 	public boolean move(Direction direction) {
 		if (direction != null) {
 			currentDirection = direction;
@@ -67,28 +77,44 @@ public class Human extends GameObject implements MoveableObject {
 		return false;
 	}
 	
+	/**
+	 * makes the human immune to the happer for 5 seconds
+	 */
 	public void becomeImmune() {
 		this.status = HumanState.IMMUNE;
 		setCorrectImage();
 		immunityTimer.restart();
 	}
 	
+	/**
+	 * removes the humans immunity status
+	 */
 	public void removeImmunity() {
 		this.status = HumanState.NORMAL;
 		setCorrectImage();
 	}
 	
-	ActionListener removeImmunity = new ActionListener() {
-		public void actionPerformed(ActionEvent evt) {
-			removeImmunity();
-			((Timer)evt.getSource()).stop();
-		}
-	};
+	private void setImmunityTimer() {
+		ActionListener removeImmunity = new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				removeImmunity();
+				((Timer)evt.getSource()).stop();
+			}
+		};
+		immunityTimer = new Timer(5100, removeImmunity);
+	}
 	
+	/**
+	 * checks to see whether the human is immune or not
+	 * @return true if the human is currently immune to the happer
+	 */
 	public boolean isImmune() {
 		return this.status == HumanState.IMMUNE;
 	}
 	
+	/**
+	 * sets the correct image for the human to use based on what direction the human is currently facing in and on the current state of the human
+	 */
 	public void setCorrectImage() {
 		switch (currentDirection) {
 			case LEFT:

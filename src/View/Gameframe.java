@@ -13,6 +13,13 @@ package View;
 import Components.GameState;
 import Model.Game;
 import java.awt.BorderLayout;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 /**
  *
@@ -25,6 +32,14 @@ public class Gameframe extends javax.swing.JFrame {
 	public Gameframe() {
 		initComponents();
 		jPlayfieldPanel.setLayout(new BorderLayout());
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setTitle("Happer");
+		try {
+			BufferedImage happer = ImageIO.read(new File("images/mens/onder.png"));
+			this.setIconImage(happer);
+		} catch (IOException ex) {
+			System.out.println(ex);
+		}
         game = new Game(this);
 	}
 
@@ -50,6 +65,14 @@ public class Gameframe extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
         setMinimumSize(null);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+            public void windowDeactivated(java.awt.event.WindowEvent evt) {
+                formWindowDeactivated(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPlayfieldPanelLayout = new javax.swing.GroupLayout(jPlayfieldPanel);
         jPlayfieldPanel.setLayout(jPlayfieldPanelLayout);
@@ -137,7 +160,13 @@ public class Gameframe extends javax.swing.JFrame {
 	}//GEN-LAST:event_jItemStartActionPerformed
 
 	private void jItemStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemStopActionPerformed
-		game.stop();
+		if (game.getState() == GameState.STOPPED || game.getState() == GameState.LOST || game.getState() == GameState.WON) {
+			if (JOptionPane.showConfirmDialog(this, "Are you sure you want to exit the game?", "Exit?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+				System.exit(0);
+		} else {
+			if (JOptionPane.showConfirmDialog(this, "Are you sure you want to stop playing this game?", "Stop playing?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+				game.stop();
+		}
 	}//GEN-LAST:event_jItemStopActionPerformed
 
 	private void jItemResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jItemResetActionPerformed
@@ -152,11 +181,24 @@ public class Gameframe extends javax.swing.JFrame {
 		if (game.getState() == GameState.PAUSED) {
 			game.resume();
 			jItemPause.setText("Pause");
-		} else if (game.getState() == GameState.STARTED) {
+		} else if (game.getState() == GameState.RUNNING) {
 			game.pause();
 			jItemPause.setText("Resume");
 		}		
 	}//GEN-LAST:event_jItemPauseActionPerformed
+
+	private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+		String onCloseMessage = "Are you sure you want to stop playing Happer?";
+		if (game.getState() == GameState.RUNNING || game.getState() == GameState.PAUSED)
+			onCloseMessage = "Are you sure you want to stop playing Happer? Any in-game progress will be lost";
+		if (JOptionPane.showConfirmDialog(this, onCloseMessage, "Exit?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+			System.exit(0);
+	}//GEN-LAST:event_formWindowClosing
+
+	private void formWindowDeactivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeactivated
+		if (game.getState() == GameState.RUNNING)
+			game.pause();
+	}//GEN-LAST:event_formWindowDeactivated
 
 	/**
 	 * @param args the command line arguments

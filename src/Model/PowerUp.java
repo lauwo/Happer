@@ -9,5 +9,5 @@ package Model;
  * @author Laurens
  */
 public interface PowerUp {
-	public void onPickUp();
+	
 }

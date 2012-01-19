@@ -9,5 +9,13 @@ package Components;
  * @author Laurens
  */
 public enum HumanState { 
-	NORMAL, IMMUNE
+
+	/**
+	 * 
+	 */
+	NORMAL,
+	/**
+	 * 
+	 */
+	IMMUNE
 }
