@@ -16,7 +16,6 @@ import Event.SlowDownListener;
 import Event.UpdateListener;
 import Model.Box;
 import Model.Field;
-import Model.Game;
 import Model.Happer;
 import Model.Human;
 import java.awt.Color;
@@ -114,7 +113,7 @@ public class Playfield extends javax.swing.JPanel implements UpdateListener {
 	}
 	
 	/**
-	 * adds the human to the game (this can only be done once, else you will simply replace the old one)
+	 * adds a human to the game
 	 * @param game the game the human is being added to
 	 */
 	public void addHuman(SlowDownListener listener) {
@@ -122,6 +121,12 @@ public class Playfield extends javax.swing.JPanel implements UpdateListener {
 		addKeyListener(human);
 	}
 	
+	/**
+	 * adds a happer to the the game 
+	 * @param speed the happers movement speed
+	 * @param gameStateListener the gamestate listener the happer listens too
+	 * @return the happer
+	 */
 	public Happer addHapper(int speed, GameStateListener gameStateListener) {
 		Happer happer = new Happer(getRandomEmptyField(), speed, this, gameStateListener);
 		return happer;

@@ -61,7 +61,9 @@ public class Pathfinder {
 			}
 		}
 		
+		
 		ArrayList<Field> emptyNeighbourFields = currentField.getEmptyNeighbourFields();
+		
 		if (!emptyNeighbourFields.isEmpty()) {
 			int random = (int)(Math.random() * emptyNeighbourFields.size()) + 1;
 			return currentField.getNeighbourDirection(emptyNeighbourFields.get(random - 1));

@@ -54,6 +54,9 @@ public class Happer extends MoveableObject implements SlowDownListener, GameStat
 		setCorrectImage();
 	}
 	
+	/**
+	 * loads in all the possible happer images, for better performance
+	 */
 	private void loadImages() {
 		try {
 			String imgLeft = "images/happer/links.png";
@@ -131,10 +134,17 @@ public class Happer extends MoveableObject implements SlowDownListener, GameStat
 		fireGameStateEvent(GameState.LOST);
 	}
 	
+	/**
+	 * fire a gamestate event
+	 * @param gameState the new gamestate
+	 */
 	private void fireGameStateEvent(GameState gameState) {
 		gameStateListener.gameStateChanged(gameState);
 	}
 	
+	/**
+	 * fire a update event (Updates the playfield)
+	 */
 	private void updatePlayfield() {
 		updateListener.updatePlayfield();
 	}
@@ -172,6 +182,9 @@ public class Happer extends MoveableObject implements SlowDownListener, GameStat
 		updatePlayfield();
 	}
 	
+	/**
+	 * Sets and enables the happer's move timer
+	 */
 	private void setHapperMovement() {
 		ActionListener happerMovement = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -200,6 +213,9 @@ public class Happer extends MoveableObject implements SlowDownListener, GameStat
 		setCorrectImage();
 	}
 	
+	/**
+	 * creates the timer for slowing down the happer
+	 */
 	private void setSlowDownTimer() {
 		ActionListener slowDownHapper = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -211,6 +227,10 @@ public class Happer extends MoveableObject implements SlowDownListener, GameStat
 		slowDownTimer = new Timer(5000, slowDownHapper);
 	}
 
+	/**
+	 * Gets called when a gamestate event that this listener listens to is fired
+	 * @param state the new GameState
+	 */
 	@Override
 	public void gameStateChanged(GameState state) {
 		switch (state) {

@@ -53,6 +53,9 @@ public class Human extends MoveableObject implements KeyListener {
 		setCorrectImage();
 	}
 	
+	/**
+	 * load in all the possible human images in for better performance
+	 */
 	private void loadImages() {
 		try {
 			String imgLeft = "images/mens/links.png";
@@ -144,6 +147,9 @@ public class Human extends MoveableObject implements KeyListener {
 		setCorrectImage();
 	}
 	
+	/**
+	 * Sets the humans immunity timer
+	 */
 	private void setImmunityTimer() {
 		ActionListener removeImmunity = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -162,10 +168,16 @@ public class Human extends MoveableObject implements KeyListener {
 		return this.status == HumanState.IMMUNE;
 	}
 	
+	/**
+	 * fires an event to update the playfield
+	 */
 	private void updatePlayfield() {
 		updateListener.updatePlayfield();
 	}
 	
+	/**
+	 * fires an event to slow down any Happers that are on the playfield
+	 */
 	private void slowDownHappers() {
 		slowDownListener.slowDown();
 	}

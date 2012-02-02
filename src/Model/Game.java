@@ -80,14 +80,6 @@ public class Game implements GameStateListener {
 	}
 	
 	/**
-	 * retrieve the current playfield
-	 * @return the current playfield
-	 */
-	public Playfield getPlayfield() {
-		return playfield;
-	}
-	
-	/**
 	 * sets the playfield to be used in the game
 	 * @param playfield the new playfield to be used 
 	 */
@@ -301,7 +293,7 @@ public class Game implements GameStateListener {
 				spawnPowerUp();
 			}
 		};
-		powerupTimer = new Timer(1000, powerUpSpawner);
+		powerupTimer = new Timer(10000, powerUpSpawner);
 		powerupTimer.start();
 	}
 	
@@ -317,6 +309,10 @@ public class Game implements GameStateListener {
 			powerUp = new SlowDown(playfield.getRandomEmptyField());
 	}
 
+	/**
+	 * Gets called whenever the gamestate is changed by a listener the game listens too
+	 * @param gameState 
+	 */
 	@Override
 	public void gameStateChanged(GameState gameState) {
 		this.gameState = gameState;
@@ -330,6 +326,10 @@ public class Game implements GameStateListener {
 		}
 	}
 	
+	/**
+	 * Fire a gamestate event
+	 * @param newState the gamestate to notify the listener of
+	 */
 	private void fireGameStateEvent(GameState newState) {
 		gameStateListener.gameStateChanged(newState);
 	}
