@@ -5,21 +5,33 @@
 package Model;
 
 import Components.Direction;
+import Components.GameState;
+import Event.GameStateListener;
+import Event.SlowDownListener;
+import Event.UpdateListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 /**
  *
  * @author Laurens
  */
-public class Happer extends GameObject implements MoveableObject {
+public class Happer extends MoveableObject implements SlowDownListener, GameStateListener {
 
-	private Game game;
 	private Timer timer;
 	private int initialSpeed;
 	private Timer slowDownTimer;
 	private Direction currentDirection;
+	private HashMap<Direction, BufferedImage> standardImages;
+	private HashMap<Direction, BufferedImage> slowImages;
+	private GameStateListener gameStateListener;
+	private UpdateListener updateListener;
 	
 	/**
 	 * creates a new happer
@@ -27,14 +39,50 @@ public class Happer extends GameObject implements MoveableObject {
 	 * @param game the game the happer is involved in
 	 * @param speed the speed that the happer should move in
 	 */
-	public Happer(Field field, Game game, int speed) {
-		super(field, "images/happer/beneden.png");
-		this.game = game;
+	public Happer(Field field, int speed, UpdateListener updateListener, GameStateListener gameStateListener) {
+		super(field);
 		this.initialSpeed = speed;
 		field.setGameObject(this);
 		setHapperMovement();
-		setSlowDownTimer();		
+		setSlowDownTimer();
 		currentDirection = Direction.DOWN;
+		standardImages = new HashMap<Direction, BufferedImage>();
+		slowImages = new HashMap<Direction, BufferedImage>();
+		this.gameStateListener = gameStateListener;
+		this.updateListener = updateListener;
+		loadImages();
+		setCorrectImage();
+	}
+	
+	private void loadImages() {
+		try {
+			String imgLeft = "images/happer/links.png";
+			String imgRight = "images/happer/rechts.png";
+			String imgUp = "images/happer/boven.png";
+			String imgDown = "images/happer/onder.png";
+			String imgLeftSlow = "images/happer/linksslow.png";
+			String imgRightSlow = "images/happer/rechtsslow.png";
+			String imgUpSlow = "images/happer/bovenslow.png";
+			String imgDownSlow = "images/happer/onderslow.png";
+			BufferedImage img = ImageIO.read(new File(imgLeft));
+			standardImages.put(Direction.LEFT, img);
+			img = ImageIO.read(new File(imgRight));
+			standardImages.put(Direction.RIGHT, img);
+			img = ImageIO.read(new File(imgUp));
+			standardImages.put(Direction.UP, img);
+			img = ImageIO.read(new File(imgDown));
+			standardImages.put(Direction.DOWN, img);
+			img = ImageIO.read(new File(imgLeftSlow));
+			slowImages.put(Direction.LEFT, img);
+			img = ImageIO.read(new File(imgRightSlow));
+			slowImages.put(Direction.RIGHT, img);
+			img = ImageIO.read(new File(imgUpSlow));
+			slowImages.put(Direction.UP, img);
+			img = ImageIO.read(new File(imgDownSlow));
+			slowImages.put(Direction.DOWN, img);
+		} catch (IOException ex) {
+
+		}
 	}
 	
 	/**
@@ -56,15 +104,15 @@ public class Happer extends GameObject implements MoveableObject {
 		}
 		if (getField().getEmptyNeighbourFields().isEmpty()) {
 			timer.stop();
-			game.win();
+			fireGameStateEvent(GameState.WON);
 		}
 		Field newField = getField().getNeighbourField(direction);				
 		if (newField != null) {
-			if (newField.isWalkable()) {
+			if (!newField.hasGameObject() || newField.getGameObject() instanceof PowerUp) {
 				newField.setGameObject(getField().getGameObject());
 				getField().setGameObject(null);
 				setField(newField);
-				game.getPlayfield().updateUI();
+				updatePlayfield();
 				return true;
 			} else if (newField.getGameObject() instanceof Human) {
 				Human human = (Human)newField.getGameObject();
@@ -80,7 +128,15 @@ public class Happer extends GameObject implements MoveableObject {
 	 */
 	private void catchHuman() {
 		timer.stop();
-		game.lose();
+		fireGameStateEvent(GameState.LOST);
+	}
+	
+	private void fireGameStateEvent(GameState gameState) {
+		gameStateListener.gameStateChanged(gameState);
+	}
+	
+	private void updatePlayfield() {
+		updateListener.updatePlayfield();
 	}
 	
 	/**
@@ -90,30 +146,30 @@ public class Happer extends GameObject implements MoveableObject {
 		switch (currentDirection) {
 			case LEFT:
 			if (slowDownTimer.isRunning())
-				super.setImage("images/happer/linksslow.png");
+				super.setImage(slowImages.get(Direction.LEFT));
 			else
-				super.setImage("images/happer/links.png");
+				super.setImage(standardImages.get(Direction.LEFT));
 			break;
 			case RIGHT:
 			if (slowDownTimer.isRunning())
-				super.setImage("images/happer/rechtsslow.png");
+				super.setImage(slowImages.get(Direction.RIGHT));
 			else
-				super.setImage("images/happer/rechts.png");
+				super.setImage(standardImages.get(Direction.RIGHT));
 			break;
 			case DOWN:
 			if (slowDownTimer.isRunning())
-				super.setImage("images/happer/benedenslow.png");
+				super.setImage(slowImages.get(Direction.DOWN));
 			else
-				super.setImage("images/happer/beneden.png");
+				super.setImage(standardImages.get(Direction.DOWN));
 			break;
 			case UP:
 			if (slowDownTimer.isRunning())
-				super.setImage("images/happer/bovenslow.png");
+				super.setImage(slowImages.get(Direction.UP));
 			else
-				super.setImage("images/happer/boven.png");
+				super.setImage(standardImages.get(Direction.UP));
 			break;
 		}
-		game.getPlayfield().updateUI();
+		updatePlayfield();
 	}
 	
 	private void setHapperMovement() {
@@ -154,4 +210,19 @@ public class Happer extends GameObject implements MoveableObject {
 		};
 		slowDownTimer = new Timer(5000, slowDownHapper);
 	}
+
+	@Override
+	public void gameStateChanged(GameState state) {
+		switch (state) {
+			case STOPPED:
+				timer.stop();
+				break;
+			case PAUSED:
+				timer.stop();
+				break;
+			case RUNNING:
+				timer.start();
+				break;
+		}
+	} 
 }

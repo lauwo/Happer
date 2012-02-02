@@ -11,18 +11,19 @@
 package View;
 
 import Components.Direction;
+import Event.GameStateListener;
+import Event.SlowDownListener;
+import Event.UpdateListener;
 import Model.Box;
 import Model.Field;
 import Model.Game;
-import Model.GameObject;
+import Model.Happer;
 import Model.Human;
 import java.awt.Color;
-import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
 import Model.Rock;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -34,12 +35,10 @@ import javax.imageio.ImageIO;
  *
  * @author Laurens
  */
-public class Playfield extends javax.swing.JPanel implements KeyListener {
+public class Playfield extends javax.swing.JPanel implements UpdateListener {
 
 	private int playfieldDimension;
 	public ArrayList<ArrayList<Field>> rows;
-	private Human human;
-	private boolean currentlyMoving;
 	private boolean walls;
 	private BufferedImage road;
 	private BufferedImage grass;
@@ -57,12 +56,10 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 		initComponents();
 		playfieldDimension = dimension;
 		this.walls = walls;
-		this.currentlyMoving = false;
 		setLayout(null);
 		rows = new ArrayList<ArrayList<Field>>();
         setBorder(BorderFactory.createLineBorder(Color.yellow, 1));
 		this.setFocusable(true);
-		addKeyListener(this);
 		initiatePlayfield();
 		loadImages();		
 	}
@@ -120,16 +117,14 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 	 * adds the human to the game (this can only be done once, else you will simply replace the old one)
 	 * @param game the game the human is being added to
 	 */
-	public void addHuman(Game game) {
-		human = new Human(getRandomEmptyField(), game);
+	public void addHuman(SlowDownListener listener) {
+		Human human = new Human(getRandomEmptyField(),listener, this);
+		addKeyListener(human);
 	}
 	
-	/**
-	 * retrieve the human
-	 * @return the human
-	 */
-	public Human getHuman() {
-		return human;
+	public Happer addHapper(int speed, GameStateListener gameStateListener) {
+		Happer happer = new Happer(getRandomEmptyField(), speed, this, gameStateListener);
+		return happer;
 	}
 	
 	/**
@@ -263,26 +258,12 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
 						}
 					}			
 				}
-				if (field.hasGameObject()) {
-					try {
-						BufferedImage img = ImageIO.read(new File(field.getGameObject().getImage()));
-						g.drawImage(img, field.getPosX(), field.getPosY(), this);
-					} catch (IOException ex) {
-
-					}
+				if (field.hasGameObject()) {				
+					g.drawImage(field.getGameObject().getImage(), field.getPosX(), field.getPosY(), this);
 				}
 			}
 		}
-    }
-
-
-	@Override
-    public boolean imageUpdate(Image img, int flags, int x, int y, int w, int h) {
-        super.imageUpdate(img, flags, x, y, w, h);
-        repaint();
-        return true;
-    }
-	
+    }	
 	
 	
 	@SuppressWarnings("unchecked")
@@ -303,49 +284,9 @@ public class Playfield extends javax.swing.JPanel implements KeyListener {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 
-	/**
-	 * this method is called whenever the actor first presses and then releases a key
-	 * @param e
-	 */
 	@Override
-	public void keyTyped(KeyEvent e) {
-	
-	}
-	
-	/**
-	 * this method gets called whenever the actor presses a key
-	 * @param e
-	 */
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (!currentlyMoving) {
-			currentlyMoving = true;
-			 switch(e.getKeyCode())	{
-				case KeyEvent.VK_DOWN:
-					human.move(Direction.DOWN);
-					break;
-				case KeyEvent.VK_UP:
-					human.move(Direction.UP);
-					break;
-				case KeyEvent.VK_RIGHT:
-					 human.move(Direction.RIGHT);
-					break;
-				case KeyEvent.VK_LEFT:
-					 human.move(Direction.LEFT);
-					break;
-				default:
-					
-				break;
-			}   
-		}
+	public void updatePlayfield() {
+		updateUI();
 	}
 
-	/**
-	 * this method is called whenever the actor releases a key
-	 * @param e
-	 */
-	@Override
-	public void keyReleased(KeyEvent e) {
-		currentlyMoving = false;
-	}
 }

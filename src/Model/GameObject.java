@@ -4,13 +4,15 @@
  */
 package Model;
 
+import java.awt.image.BufferedImage;
+
 /**
  *
  * @author Laurens
  */
 public abstract class GameObject {
 	
-	private String image;
+	private BufferedImage image;
 	private Field field;
 	
 	/**
@@ -18,9 +20,8 @@ public abstract class GameObject {
 	 * @param field the field that the GameObject should be placed upon
 	 * @param imageUrl the url to the image that the GameObject should have
 	 */
-	public GameObject(Field field, String imageUrl) {
+	public GameObject(Field field) {
 		this.field = field;
-		this.image = imageUrl;
 	}
 
 	/**
@@ -43,7 +44,7 @@ public abstract class GameObject {
 	 * retrieves the imageurl for the gameobject
 	 * @return the current imageurl for the gameobject
 	 */
-	public String getImage() {
+	public BufferedImage getImage() {
 		return image;
 	}
 
@@ -51,7 +52,7 @@ public abstract class GameObject {
 	 * sets the imageurl for the gameobject
 	 * @param image the new imageurl for the gameobject
 	 */
-	public void setImage(String image) {
+	public void setImage(BufferedImage image) {
 		this.image = image;
 	}
 }

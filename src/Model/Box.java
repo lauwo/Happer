@@ -5,19 +5,30 @@
 package Model;
 
 import Components.Direction;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 /**
  *
  * @author Laurens
  */
-public class Box extends GameObject implements MoveableObject {
+public class Box extends MoveableObject {
 	
 	/**
 	 * creates for a box
 	 * @param field the field that the box should be located on
 	 */
 	public Box(Field field) {
-		super(field, "images/pion.png");
+		super(field);
+		field.setGameObject(this);
+		try {
+			BufferedImage image = ImageIO.read(new File("images/pion.png"));
+			super.setImage(image);
+		} catch (IOException ex) {
+
+		}
 	}
 	
 	/**

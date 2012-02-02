@@ -6,32 +6,82 @@ package Model;
 
 import Components.Direction;
 import Components.HumanState;
+import Event.SlowDownListener;
+import Event.UpdateListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import javax.imageio.ImageIO;
 import javax.swing.Timer;
 /**
  *
  * @author Laurens
  */
-public class Human extends GameObject implements MoveableObject {
+public class Human extends MoveableObject implements KeyListener {
 	
-	private Game game;
 	private HumanState status;
 	private Timer immunityTimer;
 	private Direction currentDirection;
+	private boolean currentlyMoving;
+	private HashMap<Direction, BufferedImage> standardImages;
+	private HashMap<Direction, BufferedImage> immuneImages;
+	private UpdateListener updateListener;
+	private SlowDownListener slowDownListener;
 	
 	/**
 	 * creates a new human
 	 * @param field the field that the human should be located upon
 	 * @param game the game that the human is involved in
 	 */
-	public Human(Field field, Game game) {
-		super(field, "images/mens/onder.png");
-		this.game = game;
+	public Human(Field field, SlowDownListener slowDownListener, UpdateListener updateListener) {
+		super(field);
 		field.setGameObject(this);
 		this.status = HumanState.NORMAL;
+		this.currentlyMoving = false;
 		setImmunityTimer();
 		currentDirection = Direction.DOWN;
+		standardImages = new HashMap<Direction, BufferedImage>();
+		immuneImages = new HashMap<Direction, BufferedImage>();
+		this.updateListener = updateListener;
+		this.slowDownListener = slowDownListener;
+		loadImages();
+		setCorrectImage();
+	}
+	
+	private void loadImages() {
+		try {
+			String imgLeft = "images/mens/links.png";
+			String imgRight = "images/mens/rechts.png";
+			String imgUp = "images/mens/boven.png";
+			String imgDown = "images/mens/onder.png";
+			String imgLeftImmune = "images/mens/linksshield.png";
+			String imgRightImmune = "images/mens/rechtsshield.png";
+			String imgUpImmune = "images/mens/bovenshield.png";
+			String imgDownImmune = "images/mens/ondershield.png";
+			BufferedImage img = ImageIO.read(new File(imgLeft));
+			standardImages.put(Direction.LEFT, img);
+			img = ImageIO.read(new File(imgRight));
+			standardImages.put(Direction.RIGHT, img);
+			img = ImageIO.read(new File(imgUp));
+			standardImages.put(Direction.UP, img);
+			img = ImageIO.read(new File(imgDown));
+			standardImages.put(Direction.DOWN, img);
+			img = ImageIO.read(new File(imgLeftImmune));
+			immuneImages.put(Direction.LEFT, img);
+			img = ImageIO.read(new File(imgRightImmune));
+			immuneImages.put(Direction.RIGHT, img);
+			img = ImageIO.read(new File(imgUpImmune));
+			immuneImages.put(Direction.UP, img);
+			img = ImageIO.read(new File(imgDownImmune));
+			immuneImages.put(Direction.DOWN, img);
+		} catch (IOException ex) {
+
+		}
 	}
 	
 	/**
@@ -53,24 +103,24 @@ public class Human extends GameObject implements MoveableObject {
 						newField.setGameObject(getField().getGameObject());
 						getField().setGameObject(null);
 						setField(newField);
-						game.getPlayfield().updateUI();
+						updatePlayfield();
 						return true;
 					}
 				} else if (newField.getGameObject() instanceof PowerUp) {
 					if (newField.getGameObject() instanceof ImmunityShield)
 						becomeImmune();
 					else if (newField.getGameObject() instanceof SlowDown)
-						game.slowDownHapper();
+						slowDownHappers();
 					newField.setGameObject(getField().getGameObject());
 					getField().setGameObject(null);
 					setField(newField);
-					game.getPlayfield().updateUI();
+					updatePlayfield();
 				}			
 			} else  {
 				newField.setGameObject(getField().getGameObject());
 				getField().setGameObject(null);
 				setField(newField);
-				game.getPlayfield().updateUI();
+				updatePlayfield();
 				return true;
 			}
 		}
@@ -112,36 +162,90 @@ public class Human extends GameObject implements MoveableObject {
 		return this.status == HumanState.IMMUNE;
 	}
 	
+	private void updatePlayfield() {
+		updateListener.updatePlayfield();
+	}
+	
+	private void slowDownHappers() {
+		slowDownListener.slowDown();
+	}
+	
 	/**
 	 * sets the correct image for the human to use based on what direction the human is currently facing in and on the current state of the human
 	 */
-	public void setCorrectImage() {
+	private void setCorrectImage() {
 		switch (currentDirection) {
 			case LEFT:
 			if (status == HumanState.IMMUNE)
-				super.setImage("images/mens/linksshield.png");
+				super.setImage(immuneImages.get(Direction.LEFT));
 			else
-				super.setImage("images/mens/links.png");
+				super.setImage(standardImages.get(Direction.LEFT));
 			break;
 			case RIGHT:
 			if (status == HumanState.IMMUNE)
-				super.setImage("images/mens/rechtsshield.png");
+				super.setImage(immuneImages.get(Direction.RIGHT));
 			else
-				super.setImage("images/mens/rechts.png");
+				super.setImage(standardImages.get(Direction.RIGHT));
 			break;
 			case DOWN:
 			if (status == HumanState.IMMUNE)
-				super.setImage("images/mens/ondershield.png");
+				super.setImage(immuneImages.get(Direction.DOWN));
 			else
-				super.setImage("images/mens/onder.png");
+				super.setImage(standardImages.get(Direction.DOWN));
 			break;
 			case UP:
 			if (status == HumanState.IMMUNE)
-				super.setImage("images/mens/bovenshield.png");
+				super.setImage(immuneImages.get(Direction.UP));
 			else
-				super.setImage("images/mens/boven.png");						
+				super.setImage(standardImages.get(Direction.UP));						
 			break;
 		}
-		game.getPlayfield().updateUI();		
+		updatePlayfield();	
+	}
+	
+		/**
+	 * this method is called whenever the actor first presses and then releases a key
+	 * @param e
+	 */
+	@Override
+	public void keyTyped(KeyEvent e) {
+	
+	}
+	
+	/**
+	 * this method gets called whenever the actor presses a key
+	 * @param e
+	 */
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (!currentlyMoving) {
+			currentlyMoving = true;
+			 switch(e.getKeyCode())	{
+				case KeyEvent.VK_DOWN:
+					move(Direction.DOWN);
+					break;
+				case KeyEvent.VK_UP:
+					move(Direction.UP);
+					break;
+				case KeyEvent.VK_RIGHT:
+					 move(Direction.RIGHT);
+					break;
+				case KeyEvent.VK_LEFT:
+					 move(Direction.LEFT);
+					break;
+				default:
+					
+				break;
+			}   
+		}
+	}
+
+	/**
+	 * this method is called whenever the actor releases a key
+	 * @param e
+	 */
+	@Override
+	public void keyReleased(KeyEvent e) {
+		currentlyMoving = false;
 	}
 }

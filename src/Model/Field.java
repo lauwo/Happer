@@ -90,14 +90,6 @@ public class Field {
 	}
 	
 	/**
-	 * checks to see whether this field is walkable by the happer
-	 * @return true if the field does not hold a GameObject or if the GameObject is a powerup
-	 */
-	public boolean isWalkable() {
-		return gameObject == null || gameObject instanceof PowerUp;
-	}
-	
-	/**
 	 * sets a neighbourField for the field
 	 * @param direction the direction that the field should is located at
 	 * @param field the neighbourField

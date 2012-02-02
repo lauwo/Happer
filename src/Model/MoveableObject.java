@@ -10,11 +10,15 @@ import Components.Direction;
  *
  * @author Laurens
  */
-public interface MoveableObject {
+public abstract class MoveableObject extends GameObject {
+	
+	public MoveableObject(Field field) {
+		super(field);
+	}
 	/**
 	 * moves the MoveableObject in a given direction
 	 * @param direction the direction for the MoveableObject to move in
 	 * @return true if the MoveableObject moved
 	 */
-	public boolean move(Direction direction);
+	public abstract boolean move(Direction direction);
 }

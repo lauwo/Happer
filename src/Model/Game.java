@@ -6,6 +6,7 @@ package Model;
 
 import Components.Difficulty;
 import Components.GameState;
+import Event.GameStateListener;
 import View.Gameframe;
 import View.Options;
 import View.Playfield;
@@ -20,7 +21,7 @@ import javax.swing.Timer;
  *
  * @author Laurens
  */
-public class Game {
+public class Game implements GameStateListener {
 
 	private Gameframe gameWindow;
 	private Playfield playfield;
@@ -29,9 +30,8 @@ public class Game {
 	private int boxPercentage;
 	private int rockPercentage;
 	private Difficulty difficulty;
-	private Human human;
-	private Happer happer;
 	private Timer powerupTimer;
+	private GameStateListener gameStateListener;
 	
 	/**
 	 * create a new game
@@ -66,19 +66,15 @@ public class Game {
 	private void initPlayfield(int fieldDimension, int boxPercentage, int rockPercentage, Difficulty difficulty) {
 		Dimension dimension = new Dimension(fieldDimension * Field.width + 6, fieldDimension * Field.height + 51);
 		this.playfield = null;
-		if (happer != null)
-			happer.getTimer().stop();
 		if (powerupTimer != null)
 			powerupTimer.stop();
-		happer = null;
-		human = null;
 		setPlayfield(new Playfield(fieldDimension, true));
 		gameWindow.setSize(dimension);
 		playfield.addGameObjects(boxPercentage, rockPercentage);
-		playfield.addHuman(this);
 		int happerSpeed = difficulty == Difficulty.HARD ? 250 : difficulty == Difficulty.MEDIUM ? 500 : 750;
-		happer = new Happer(playfield.getRandomEmptyField(), this, happerSpeed);
-		human = playfield.getHuman();
+		Happer happer = playfield.addHapper(happerSpeed, this);
+		gameStateListener = happer;
+		playfield.addHuman(happer);
 		activatePowerUps();
 		resume();
 	}
@@ -103,22 +99,24 @@ public class Game {
 	 * pauses the game
 	 */
 	public void pause() {
-		gameState = gameState.PAUSED;
+		gameState = GameState.PAUSED;
 		playfield.setEnabled(false);
-	    happer.getTimer().stop();
+		powerupTimer.stop();
 		showStatusPanel();
+		fireGameStateEvent(gameState);
 	}
 	
 	/**
 	 * starts the game
 	 */
 	public void start() {
-		gameState = gameState.RUNNING;
+		gameState = GameState.RUNNING;
 		gameWindow.jPlayfieldPanel.removeAll();
 		initPlayfield(playfieldDimension, boxPercentage, rockPercentage, difficulty);
 		gameWindow.jPlayfieldPanel.add(playfield);
 		playfield.setRequestFocusEnabled(true);
 		playfield.requestFocus();
+		fireGameStateEvent(gameState);
 	}
 	
 	/**
@@ -128,16 +126,18 @@ public class Game {
 		if (gameState == GameState.PAUSED) {
 			restorePlayfield();
 			playfield.setEnabled(true);
-			gameState = gameState.RUNNING;
-			happer.getTimer().start();
+			gameState = GameState.RUNNING;
+			powerupTimer.start();
 			playfield.requestFocus();
 		}
+		fireGameStateEvent(gameState);
 	}
 	
 	/**
 	 * resets the game
 	 */
 	public void reset() {
+		fireGameStateEvent(GameState.STOPPED);
 		gameWindow.jPlayfieldPanel.removeAll();
 		initPlayfield(playfieldDimension, boxPercentage, rockPercentage, difficulty);
 		start();
@@ -151,6 +151,7 @@ public class Game {
 		if (gameState == GameState.RUNNING)
 			pause();
 		gameState = gameState.STOPPED;
+		fireGameStateEvent(gameState);
 		showStatusPanel();
 	}
 
@@ -258,14 +259,6 @@ public class Game {
 	}
 	
 	/**
-	 * retrieve the human
-	 * @return the human
-	 */
-	public Human getHuman() {
-		return human;
-	}
-	
-	/**
 	 * shows a new panel that will check the state of the game and show information accordingly
 	 */
 	private void showStatusPanel() {
@@ -298,14 +291,6 @@ public class Game {
 		Dimension dimension = new Dimension(playfieldDimension * Field.width + 8, playfieldDimension * Field.height + 50);
 		gameWindow.setSize(dimension);
 	}
-	
-	/**
-	 * slows down the happer (used for powerup)
-	 */
-	public void slowDownHapper() {
-		happer.slowDown();
-	}
-	
 	/**
 	 * activates powerups for the current game
 	 */
@@ -316,7 +301,7 @@ public class Game {
 				spawnPowerUp();
 			}
 		};
-		powerupTimer = new Timer(10000, powerUpSpawner);
+		powerupTimer = new Timer(1000, powerUpSpawner);
 		powerupTimer.start();
 	}
 	
@@ -330,5 +315,22 @@ public class Game {
 			powerUp = new ImmunityShield(playfield.getRandomEmptyField());
 		else if (random == 2)
 			powerUp = new SlowDown(playfield.getRandomEmptyField());
+	}
+
+	@Override
+	public void gameStateChanged(GameState gameState) {
+		this.gameState = gameState;
+		switch (gameState) {
+			case WON:
+				win();
+				break;
+			case LOST:
+				lose();
+				break;				
+		}
+	}
+	
+	private void fireGameStateEvent(GameState newState) {
+		gameStateListener.gameStateChanged(newState);
 	}
 }

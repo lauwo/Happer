@@ -2,14 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model;
+package Event;
 
 /**
  *
  * @author Laurens
  */
-public abstract class PowerUp extends GameObject {
-	public PowerUp(Field field) {
-		super(field);
-	}
+public interface UpdateListener {
+	public void updatePlayfield();
 }
